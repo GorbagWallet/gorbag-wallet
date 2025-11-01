@@ -1,0 +1,63 @@
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { ChevronLeft } from "lucide-react";
+
+interface ImportNicknameStepProps {
+  onNext: (nickname: string) => void;
+  onBack: () => void;
+}
+
+export function ImportNicknameStep({ onNext, onBack }: ImportNicknameStepProps) {
+  const [nickname, setNickname] = useState("");
+  const [isAnimating, setAnimating] = useState(false);
+
+  const handleNextClick = () => {
+    if (!nickname.trim()) return;
+    setAnimating(true);
+    setTimeout(() => {
+      setAnimating(false);
+      onNext(nickname);
+    }, 300);
+  };
+
+  return (
+    <div className="plasmo-w-full">
+      <button onClick={onBack} className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-text-muted-foreground hover:plasmo-text-foreground plasmo-mb-6">
+        <ChevronLeft className="plasmo-h-4 plasmo-w-4" />
+        Back
+      </button>
+
+      <div className="plasmo-mb-8">
+        <h2 className="plasmo-text-2xl plasmo-font-bold plasmo-text-foreground plasmo-mb-2">Import Wallet</h2>
+        <p className="plasmo-text-muted-foreground plasmo-text-sm">Give your imported wallet a name</p>
+      </div>
+
+      <div className="plasmo-space-y-4">
+        <div>
+          <Label htmlFor="nickname" className="plasmo-text-foreground plasmo-mb-2 plasmo-block">
+            Wallet Nickname
+          </Label>
+          <Input
+            id="nickname"
+            placeholder="e.g., My Imported Wallet"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            className="plasmo-h-12"
+          />
+        </div>
+
+        <Button
+          onClick={handleNextClick}
+          disabled={!nickname.trim()}
+          size="lg"
+          className={`plasmo-w-full plasmo-h-12 ${
+            isAnimating ? "animate-pop" : ""
+          }`}>
+          Continue
+        </Button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#plasmo-shadow-container {
+  all: initial;
+  box-sizing: border-box;
+}
+
+@layer base {
+  * {
+    @apply plasmo-border-border;
+  }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    @apply plasmo-bg-background plasmo-text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* added soft pop animation for buttons and interactive elements */
+@keyframes soft-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pop {
+  animation: soft-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* added tab switch animation */
+@keyframes tab-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-tab-pop {
+  animation: tab-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

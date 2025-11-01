@@ -1,0 +1,2 @@
+patchedDependencies:
+  math-intrinsics@1.1.0: patches/math-intrinsics@1.1.0.patch
