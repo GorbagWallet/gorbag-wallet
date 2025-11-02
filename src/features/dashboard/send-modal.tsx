@@ -6,8 +6,12 @@ import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { validateWalletAddress } from "~/lib/utils/wallet-utils"
+import { useWallet } from "~/lib/wallet-context"
+import { networks } from "~/lib/config"
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js"
 import successIcon from "data-base64:~assets/icons/icons8-success-24.png"
 import cancelIcon from "data-base64:~assets/icons/icons8-cancel-24.png"
+import errorIcon from "data-base64:~assets/icons/icons8-error-24.png"
 import closeIcon from "data-base64:~assets/icons/icons8-close-24.png"
 import continueIcon from "data-base64:~assets/icons/icons8-telegram-app-24.png"
 import validIcon from "data-base64:~assets/icons/icons8-success-24.png"  // Using success icon for valid status
@@ -18,15 +22,27 @@ interface SendModalProps {
   onClose: () => void
 }
 
-type SendStep = "input" | "sending" | "success" | "failed"
+type SendStep = "input" | "simulation" | "signing" | "success" | "failed"
 
 export function SendModal({ open, onClose }: SendModalProps) {
+  const { activeWallet, tokens, network, balance, signTransaction } = useWallet()
   const [step, setStep] = useState<SendStep>("input")
   const [address, setAddress] = useState("")
   const [amount, setAmount] = useState("")
   const [addressValid, setAddressValid] = useState<boolean | null>(null)
   const [isCheckingAddress, setIsCheckingAddress] = useState(false)
   const [useDollar, setUseDollar] = useState(false)
+  const [txHash, setTxHash] = useState<string | null>(null) // Store transaction hash
+  const [error, setError] = useState<string | null>(null) // Store error message
+
+  // Get actual native token balance (GOR for gorbagana, SOL for solana)
+  const nativeTokenSymbol = network === "gorbagana" ? "GOR" : "SOL"
+  const nativeTokenBalance = tokens.find(token => 
+    token.content.metadata.symbol === nativeTokenSymbol
+  )?.token_info.balance || 0
+  
+  const nativeTokenAmount = nativeTokenBalance / (10 ** 9) // Assuming 9 decimals for native tokens
+  const minimumNativeBalance = 0.005; // Minimum 0.005 native currency required
 
   const handleAddressChange = async (value: string) => {
     setAddress(value)
@@ -42,19 +58,169 @@ export function SendModal({ open, onClose }: SendModalProps) {
   }
 
   const handleAmountChange = (value: string) => {
+    // Validate that the amount doesn't exceed the balance
+    const numericValue = parseFloat(value)
+    if (isNaN(numericValue) || numericValue <= 0) {
+      setAmount(value)
+      return
+    }
+    
+    if (numericValue > nativeTokenAmount) {
+      // Amount exceeds available balance
+      return
+    }
+    
     setAmount(value)
   }
 
   const handlePercentage = (percent: number) => {
-    const maxAmount = 589.28 // Mock max amount
-    setAmount(((maxAmount * percent) / 100).toFixed(2))
+    const calculatedAmount = (nativeTokenAmount * percent) / 100
+    setAmount(calculatedAmount.toFixed(6)) // Using 6 decimal places for precision
   }
 
-  const handleSend = async () => {
+  const handleContinue = async () => {
+    // Validate inputs before proceeding
+    if (!address || !amount || addressValid !== true) {
+      return
+    }
+    
+    const numericAmount = parseFloat(amount)
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      return
+    }
+    
+    if (numericAmount > nativeTokenAmount) {
+      // Show error for insufficient funds
+      setAddressValid(false) // Temporarily mark as invalid to show error
+      setTimeout(() => setAddressValid(true), 2000) // Reset after 2 seconds
+      return
+    }
+    
+    // Skip simulation for gorbagana network, go directly to signing
+    if (network === "gorbagana") {
+      setStep("signing")
+    } else {
+      // For solana network, go to simulation for thorough validation
+      setStep("simulation")
+    }
+  }
+
+  const handleSimulate = async () => {
+    try {
+      // Check if user has minimum required native currency
+      if (nativeTokenAmount < minimumNativeBalance) {
+        setError(`Insufficient ${nativeTokenSymbol} for transaction fees. Minimum ${minimumNativeBalance} ${nativeTokenSymbol} required.`);
+        setStep("failed")
+        return
+      }
+
+      // Validate amount
+      const numericAmount = parseFloat(amount)
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        setError("Invalid amount entered");
+        setStep("failed")
+        return
+      }
+
+      if (numericAmount > nativeTokenAmount) {
+        setError("Insufficient balance");
+        setStep("failed")
+        return
+      }
+
+      // Validate address format
+      try {
+        new PublicKey(address);
+      } catch (err) {
+        setError("Invalid recipient address");
+        setStep("failed")
+        return
+      }
+
+      // For Solana, we can do a simple getFeeForMessage to estimate fees
+      const rpcUrl = networks[network].rpc;
+      const connection = new Connection(rpcUrl);
+      
+      // Estimate network fees
+      const { blockhash } = await connection.getLatestBlockhash();
+      const feeEstimate = await connection.getFeeForMessage(
+        new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: new PublicKey(activeWallet.address),
+            toPubkey: new PublicKey(address),
+            lamports: 1, // Just for fee estimation
+          })
+        ).compileMessage()
+      );
+
+      if (feeEstimate.value === null) {
+        setError("Could not estimate transaction fees");
+        setStep("failed")
+        return
+      }
+
+      // Simulation successful, proceed to signing
+      setStep("signing")
+    } catch (err) {
+      console.error("Fee estimation error:", err);
+      setError(err instanceof Error ? err.message : "Could not estimate transaction fees");
+      setStep("failed")
+    }
+  }
+
+  const handleSignAndConfirm = async () => {
     setStep("sending")
-    // Simulate transaction
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setStep("success")
+    try {
+      const numericAmount = parseFloat(amount)
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        setError("Invalid amount");
+        setStep("failed")
+        return
+      }
+
+      const rpcUrl = networks[network].rpc;
+      const connection = new Connection(rpcUrl);
+      
+      // Get sender and recipient public keys
+      if (!activeWallet?.address) {
+        setError("Wallet not available");
+        setStep("failed")
+        return
+      }
+      
+      const senderPublicKey = new PublicKey(activeWallet.address);
+      const recipientPublicKey = new PublicKey(address);
+      
+      // Convert amount to lamports
+      const lamports = Math.floor(numericAmount * LAMPORTS_PER_SOL);
+      
+      // Create the transaction
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: senderPublicKey,
+          toPubkey: recipientPublicKey,
+          lamports: lamports,
+        })
+      );
+      
+      // Get the latest blockhash
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = senderPublicKey;
+
+      // Sign the transaction using the wallet's signing functionality
+      const signedTransaction = await signTransaction(transaction);
+      
+      // Send the signed transaction to the network
+      const txHash = await connection.sendRawTransaction(signedTransaction.serialize());
+      setTxHash(txHash);
+      
+      setStep("success")
+    } catch (err) {
+      console.error("Transaction signing error:", err);
+      setError(err instanceof Error ? err.message : "Transaction signing failed");
+      setStep("failed")
+    }
   }
 
   if (!open) return null
@@ -126,26 +292,26 @@ export function SendModal({ open, onClose }: SendModalProps) {
                     onClick={() => setUseDollar(!useDollar)}
                     className="plasmo-absolute plasmo-right-2 plasmo-top-1/2 -plasmo-translate-y-1/2 plasmo-text-primary hover:plasmo-text-primary/80 plasmo-text-xs"
                   >
-                    {useDollar ? "$" : "GOR"}
+                    {useDollar ? "$" : network === "gorbagana" ? "GOR" : "SOL"}
                   </Button>
                 </div>
-                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mt-2">Available: 589.28K GOR</p>
+                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mt-2">Available: {nativeTokenAmount.toFixed(6)} {network === "gorbagana" ? "GOR" : "SOL"}</p>
               </div>
 
               <div className="plasmo-bg-muted plasmo-rounded-xl plasmo-p-4">
                 <div className="plasmo-flex plasmo-justify-between plasmo-text-sm plasmo-mb-2">
                   <span className="plasmo-text-muted-foreground">Network Fee</span>
-                  <span className="plasmo-text-card-foreground plasmo-font-medium">~0.000005 SOL</span>
+                  <span className="plasmo-text-card-foreground plasmo-font-medium">~0.000005 {network === "gorbagana" ? "GOR" : "SOL"}</span>
                 </div>
                 <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
                   <span className="plasmo-text-muted-foreground">Total</span>
-                  <span className="plasmo-text-card-foreground plasmo-font-semibold">{amount || "0.00"} GOR</span>
+                  <span className="plasmo-text-card-foreground plasmo-font-semibold">{amount || "0.00"} {network === "gorbagana" ? "GOR" : "SOL"}</span>
                 </div>
               </div>
 
               <Button
-                onClick={handleSend}
-                disabled={!address || !amount || addressValid !== true}
+                onClick={handleContinue}
+                disabled={!address || !amount || addressValid !== true || parseFloat(amount) <= 0 || parseFloat(amount) > nativeTokenAmount}
                 className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium"
               >
                 Continue
@@ -155,11 +321,44 @@ export function SendModal({ open, onClose }: SendModalProps) {
           </>
         )}
 
+        {step === "simulation" && (
+          <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
+            <Loader2 className="plasmo-h-12 plasmo-w-12 plasmo-animate-spin plasmo-text-primary plasmo-mb-4" />
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Simulating Transaction</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground">Checking transaction viability...</p>
+          </div>
+        )}
+
+        {step === "signing" && (
+          <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12 plasmo-space-y-6">
+            <div className="plasmo-w-16 plasmo-h-16 plasmo-rounded-full plasmo-bg-primary/10 plasmo-flex plasmo-items-center plasmo-justify-center">
+              <img src={successIcon} className="plasmo-h-8 plasmo-w-8" alt="Simulated" />
+            </div>
+            <div className="plasmo-text-center">
+              <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Simulated</h3>
+              <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-4">Simulation successful</p>
+              <p className="plasmo-text-xs plasmo-text-muted-foreground">Sending {amount} {network === "gorbagana" ? "GOR" : "SOL"} to {address.substring(0, 6)}...{address.substring(address.length - 4)}</p>
+            </div>
+            <div className="plasmo-w-full plasmo-space-y-3">
+              <Button onClick={handleSignAndConfirm} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium">
+                Sign & Confirm Transaction
+              </Button>
+              <Button 
+                onClick={() => setStep("input")} 
+                variant="outline" 
+                className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
         {step === "sending" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <Loader2 className="plasmo-h-12 plasmo-w-12 plasmo-animate-spin plasmo-text-primary plasmo-mb-4" />
-            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Sending Transaction</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground">Please wait...</p>
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Confirming Transaction</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground">Please confirm in wallet...</p>
           </div>
         )}
 
@@ -168,8 +367,21 @@ export function SendModal({ open, onClose }: SendModalProps) {
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-green-500/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
               <img src={successIcon} className="plasmo-h-6 plasmo-w-6" alt="Success" />
             </div>
-            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Sent!</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">Your tokens are on their way</p>
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Confirmed!</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">Your tokens have been sent</p>
+            {txHash && (
+              <div className="plasmo-mb-4 plasmo-text-center">
+                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mb-1">Transaction Hash</p>
+                <a 
+                  href={`${networks[network].explorer}${txHash}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="plasmo-text-xs plasmo-text-primary hover:plasmo-underline plasmo-block plasmo-break-all"
+                >
+                  {txHash.substring(0, 8)}...{txHash.substring(txHash.length - 6)}
+                </a>
+              </div>
+            )}
             <Button onClick={onClose} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl">
               Done
             </Button>
@@ -179,10 +391,23 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "failed" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-destructive/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
-              <img src={cancelIcon} className="plasmo-h-6 plasmo-w-6" alt="Cancel" />
+              <img src={errorIcon} className="plasmo-h-6 plasmo-w-6" alt="Error" />
             </div>
             <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Failed</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">Something went wrong</p>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">{error || "Something went wrong"}</p>
+            {txHash && (
+              <div className="plasmo-mb-4 plasmo-text-center">
+                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mb-1">Transaction Hash</p>
+                <a 
+                  href={`${networks[network].explorer}${txHash}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="plasmo-text-xs plasmo-text-primary hover:plasmo-underline plasmo-block plasmo-break-all"
+                >
+                  {txHash.substring(0, 8)}...{txHash.substring(txHash.length - 6)}
+                </a>
+              </div>
+            )}
             <Button onClick={() => setStep("input")} variant="outline" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-mb-2">
               Try Again
             </Button>

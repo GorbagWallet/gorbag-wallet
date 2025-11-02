@@ -35,6 +35,7 @@ interface WalletContextType {
   deleteWallet: (id: string) => void;
   toggleHiddenToken: (tokenId: string) => void;
   isTokenHidden: (tokenId: string) => boolean;
+  signTransaction: (transaction: any) => Promise<any>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -60,6 +61,43 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [portfolioValue, setPortfolioValue] = useState(0);
   const [rawTokens, setRawTokens] = useState<any[]>([]);
   const [tokens, setTokens] = useState<any[]>([]);
+
+  // Add signing functionality that works for both seed phrase and private key imported wallets
+  async function signTransaction(transaction: any) {
+    if (!activeWallet) {
+      throw new Error("No active wallet available for signing");
+    }
+
+    // Check if we have the seed phrase (for created wallets or seed phrase imported wallets)
+    if (activeWallet.seedPhrase && activeWallet.seedPhrase.length > 0) {
+      // Derive the keypair from the seed phrase when needed
+      const { importWallet } = await import("~/lib/utils/wallet-utils");
+      const walletData = await importWallet(activeWallet.seedPhrase.join(" "));
+      const keypair = walletData.keypair;
+      
+      // Sign the transaction with the derived keypair
+      transaction.sign(keypair);
+      return transaction;
+    } 
+    // Check if we have the private key (for private key imported wallets)
+    else if (activeWallet.privateKey) {
+      // Derive the keypair from the private key
+      const { importWallet } = await import("~/lib/utils/wallet-utils");
+      try {
+        const walletData = await importWallet(activeWallet.privateKey);
+        const keypair = walletData.keypair;
+        
+        // Sign the transaction with the keypair
+        transaction.sign(keypair);
+        return transaction;
+      } catch (err) {
+        console.error("Error signing with private key:", err);
+        throw new Error("Error signing transaction with private key");
+      }
+    } else {
+      throw new Error("No seed phrase or private key available for signing");
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -255,6 +293,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         tokens,
         preferredCurrency,
         setPreferredCurrency,
+        signTransaction,
       }}>
       {children}
     </WalletContext.Provider>

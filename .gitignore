@@ -31,3 +31,7 @@ dist/
 
 # typescript
 .tsbuildinfo
+
+# misc
+current_stage.txt
+final-test.js
