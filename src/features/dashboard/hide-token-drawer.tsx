@@ -56,7 +56,7 @@ export function HideTokenDrawer({ open, onOpenChange, tokens }: HideTokenDrawerP
                 }`}
               >
                 <div className="plasmo-flex plasmo-items-center plasmo-gap-3">
-                  <span className="plasmo-text-2xl">{token.icon}</span>
+                  <img src={token.icon} alt={token.name} className="plasmo-w-8 plasmo-h-8 plasmo-rounded-full" />
                   <div className="plasmo-text-left">
                     <p className="plasmo-font-medium plasmo-text-foreground">{token.symbol}</p>
                     <p className="plasmo-text-xs plasmo-text-muted-foreground">{token.name}</p>

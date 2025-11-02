@@ -7,99 +7,10 @@ import { Eye } from "lucide-react"
 import { useState } from "react"
 import { HideTokenDrawer } from "./hide-token-drawer"
 
-const tokens = [
-  {
-    id: "gor",
-    symbol: "GOR",
-    name: "Gorbagana",
-    amount: "589.28K",
-    value: "$283,382.00",
-    change: "+8.42%",
-    positive: true,
-    icon: "🌿",
-    price: 0.48,
-  },
-  {
-    id: "sol",
-    symbol: "SOL",
-    name: "Solana",
-    amount: "842.15",
-    value: "$89,145.00",
-    change: "+2.15%",
-    positive: true,
-    icon: "◎",
-    price: 105.89,
-  },
-  {
-    id: "usdc",
-    symbol: "USDC",
-    name: "USD Coin",
-    amount: "25,000",
-    value: "$25,000.00",
-    change: "0.00%",
-    positive: true,
-    icon: "💵",
-    price: 1.0,
-  },
-  {
-    id: "ray",
-    symbol: "RAY",
-    name: "Raydium",
-    amount: "1,245.67",
-    value: "$4,313.00",
-    change: "-1.23%",
-    positive: false,
-    icon: "⚡",
-    price: 3.46,
-  },
-  {
-    id: "gor2",
-    symbol: "GOR",
-    name: "Gorbagana",
-    amount: "589.28K",
-    value: "$283,382.00",
-    change: "+8.42%",
-    positive: true,
-    icon: "🌿",
-    price: 0.48,
-  },
-  {
-    id: "sol2",
-    symbol: "SOL",
-    name: "Solana",
-    amount: "842.15",
-    value: "$89,145.00",
-    change: "+2.15%",
-    positive: true,
-    icon: "◎",
-    price: 105.89,
-  },
-  {
-    id: "usdc2",
-    symbol: "USDC",
-    name: "USD Coin",
-    amount: "25,000",
-    value: "$25,000.00",
-    change: "0.00%",
-    positive: true,
-    icon: "💵",
-    price: 1.0,
-  },
-  {
-    id: "ray2",
-    symbol: "RAY",
-    name: "Raydium",
-    amount: "1,245.67",
-    value: "$4,313.00",
-    change: "-1.23%",
-    positive: false,
-    icon: "⚡",
-    price: 3.46,
-  },
-]
+import { gorbaganaTokens, solanaTokens } from "~/lib/token-data"
 
 interface TokenListProps {
-  loading?: boolean;
+  loading?: boolean
 }
 
 function TokenCardSkeleton() {
@@ -115,26 +26,27 @@ function TokenCardSkeleton() {
         <div className="plasmo-h-3 plasmo-w-12 plasmo-bg-muted plasmo-animate-pulse plasmo-rounded plasmo-mt-1"></div>
       </div>
     </div>
-  );
+  )
 }
 
 export function TokenList({ loading = false }: TokenListProps) {
-  const { isTokenHidden } = useWallet();
-  const [showHideDrawer, setShowHideDrawer] = useState(false);
+  const { isTokenHidden, network } = useWallet()
+  const [showHideDrawer, setShowHideDrawer] = useState(false)
 
-  const visibleTokens = tokens.filter((token) => !isTokenHidden(token.id));
+  const tokens = network === "solana" ? solanaTokens : gorbaganaTokens
+
+  const visibleTokens = tokens.filter((token) => !isTokenHidden(token.id))
 
   return (
     <>
-      <div className="plasmo-space-y-2">
-        <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-1 plasmo-mb-3">
+      <div className="">
+        <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-3">
           <h2 className="plasmo-text-sm plasmo-font-medium plasmo-text-muted-foreground">Your Tokens</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowHideDrawer(true)}
-            className="plasmo-h-6 plasmo-px-2 plasmo-rounded-lg plasmo-text-xs hover:plasmo-bg-secondary"
-          >
+            className="plasmo-h-6 plasmo-px-2 plasmo-rounded-lg plasmo-text-xs hover:plasmo-bg-secondary">
             <Eye className="plasmo-h-3.5 plasmo-w-3.5 plasmo-mr-1" />
             Hide
           </Button>
@@ -142,15 +54,17 @@ export function TokenList({ loading = false }: TokenListProps) {
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => <TokenCardSkeleton key={i} />)
         ) : (
-          visibleTokens.map((token) => (
-            <div key={token.id} onClick={() => { /* Handle navigation to token details */ }}>
-              <TokenCard {...token} />
-            </div>
-          ))
+          <div>
+            {visibleTokens.map((token) => (
+              <div key={token.id} onClick={() => { /* Handle navigation to token details */ }} className="plasmo-mb-2">
+                <TokenCard {...token} />
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
       <HideTokenDrawer open={showHideDrawer} onOpenChange={setShowHideDrawer} tokens={tokens} />
     </>
-  );
+  )
 }

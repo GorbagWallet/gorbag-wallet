@@ -12,16 +12,20 @@ export interface Wallet {
   hiddenTokens?: string[];
 }
 
+export type Network = "gorbagana" | "solana"
+
 interface WalletContextType {
-  wallets: Wallet[];
-  activeWallet: Wallet | null;
-  loading: boolean;
-  setActiveWallet: (wallet: Wallet | null) => void;
-  addWallet: (wallet: Wallet) => void;
-  updateWallet: (wallet: Wallet) => void;
-  deleteWallet: (id: string) => void;
-  toggleHiddenToken: (tokenId: string) => void;
-  isTokenHidden: (tokenId: string) => boolean;
+  wallets: Wallet[]
+  activeWallet: Wallet | null
+  loading: boolean
+  network: Network
+  setNetwork: (network: Network) => void
+  setActiveWallet: (wallet: Wallet | null) => void
+  addWallet: (wallet: Wallet) => void
+  updateWallet: (wallet: Wallet) => void
+  deleteWallet: (id: string) => void
+  toggleHiddenToken: (tokenId: string) => void
+  isTokenHidden: (tokenId: string) => boolean
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -29,6 +33,7 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [wallets, setWallets] = useStorage<Wallet[]>("gorbag_wallets", []);
   const [activeWalletId, setActiveWalletId] = useStorage<string | null>("gorbag_active_wallet", null);
+  const [network, setNetwork] = useStorage<Network>("gorbagana_network", "gorbagana")
   const [activeWallet, setActiveWalletState] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -90,6 +95,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         wallets,
         activeWallet,
         loading,
+        network,
+        setNetwork,
         setActiveWallet,
         addWallet,
         updateWallet,

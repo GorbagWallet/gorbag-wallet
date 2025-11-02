@@ -56,7 +56,7 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
   }
 
   return (
-    <header className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-4 plasmo-py-6 plasmo-border-b plasmo-border-border">
+    <header className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-py-6">
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-auto plasmo-p-0">
@@ -109,10 +109,10 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
       </DropdownMenu>
 
       <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
-        <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => { /* router.push("/dashboard/activity") */ }}>
+        <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => onNavigate("activity")}>
           <History className="plasmo-h-5 plasmo-w-5" />
         </Button>
-        <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => { /* router.push("/dashboard/settings") */ }}>
+        <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => onNavigate("settings")}>
           <svg className="plasmo-h-5 plasmo-w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"

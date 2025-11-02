@@ -35,10 +35,10 @@ export function PortfolioBalance({ hidden = false, loading = false }: PortfolioB
   }
 
   return (
-    <div className="plasmo-text-center plasmo-py-8">
+    <div className="plasmo-text-center plasmo-pb-6">
       <p className="plasmo-text-muted-foreground plasmo-text-sm plasmo-mb-2">Total Balance</p>
-      <h1 className="plasmo-text-5xl plasmo-font-bold plasmo-text-foreground plasmo-mb-3 plasmo-text-balance plasmo-font-mono">
-        {hidden ? "****" : `${formattedBalance}Ko`}
+      <h1 className="plasmo-text-5xl plasmo-font-bold plasmo-text-foreground plasmo-mb-3 plasmo-text-balance plasmo-font-sans">
+        {hidden ? "****" : `${formattedBalance}K`}
       </h1>
       <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-text-primary">
         <TrendingUp className="plasmo-h-4 plasmo-w-4" />

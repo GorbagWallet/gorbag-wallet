@@ -1,7 +1,7 @@
 import * as bip39 from "bip39";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
-import * as bs58 from "bs58";
+import bs58 from "bs58";
 import { derivePath } from "ed25519-hd-key";
 
 export function generateSeedPhrase(): string[] {
@@ -48,7 +48,10 @@ export async function importWallet(input: string): Promise<{
 
     // Check if it's a base58 private key
     try {
+        console.log("Trimmed input:", trimmed);
         const privateKey = bs58.decode(trimmed);
+        console.log("Decoded private key:", privateKey);
+        console.log("Private key length:", privateKey.length);
         if (privateKey.length === 64) {
             const keyPairNacl = nacl.sign.keyPair.fromSecretKey(privateKey);
             const keypair = Keypair.fromSecretKey(keyPairNacl.secretKey); // Reconstruct using @solana/web3.js Keypair

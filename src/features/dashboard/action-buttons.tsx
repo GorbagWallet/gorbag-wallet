@@ -21,7 +21,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
     <div className="plasmo-flex plasmo-gap-3 plasmo-mb-8">
       <Button
         onClick={() => handleClick("send")}
-        className={`plasmo-flex-1 plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium plasmo-transition-transform ${
+        className={`plasmo-flex-1 plasmo-h-12 plasmo-py-6 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium plasmo-transition-transform ${
           animatingButton === "send" ? "animate-pop" : ""
         }`}
       >
@@ -31,7 +31,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
       <Button
         onClick={() => handleClick("receive")}
         variant="secondary"
-        className={`plasmo-flex-1 plasmo-h-12 plasmo-rounded-xl plasmo-font-medium plasmo-transition-transform ${
+        className={`plasmo-flex-1 plasmo-h-12 plasmo-py-6 plasmo-rounded-xl plasmo-font-medium plasmo-transition-transform ${
           animatingButton === "receive" ? "animate-pop" : ""
         }`}
       >
@@ -41,7 +41,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
       <Button
         onClick={() => handleClick("swap")}
         variant="secondary"
-        className={`plasmo-flex-1 plasmo-h-12 plasmo-rounded-xl plasmo-font-medium plasmo-transition-transform ${
+        className={`plasmo-flex-1 plasmo-h-12 plasmo-py-6 plasmo-rounded-xl plasmo-font-medium plasmo-transition-transform ${
           animatingButton === "swap" ? "animate-pop" : ""
         }`}
       >
