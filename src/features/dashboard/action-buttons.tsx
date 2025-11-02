@@ -1,8 +1,10 @@
 "use client"
 
-import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { useState } from "react"
+import sendIcon from "data-base64:~assets/icons/icons8-telegram-app-24.png"
+import receiveIcon from "data-base64:~assets/icons/icons8-down-left-arrow-24.png"
+import swapIcon from "data-base64:~assets/icons/icons8-thunder-24.png"
 
 interface ActionButtonsProps {
   onAction: (action: "send" | "receive" | "swap") => void
@@ -25,7 +27,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
           animatingButton === "send" ? "animate-pop" : ""
         }`}
       >
-        <ArrowUpRight className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
+        <img src={sendIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Send" />
         Send
       </Button>
       <Button
@@ -35,7 +37,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
           animatingButton === "receive" ? "animate-pop" : ""
         }`}
       >
-        <ArrowDownLeft className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
+        <img src={receiveIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Receive" />
         Receive
       </Button>
       <Button
@@ -45,7 +47,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
           animatingButton === "swap" ? "animate-pop" : ""
         }`}
       >
-        <ArrowLeftRight className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
+        <img src={swapIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Swap" />
         Swap
       </Button>
     </div>

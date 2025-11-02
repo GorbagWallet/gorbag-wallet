@@ -5,8 +5,8 @@ interface TokenCardProps {
   name: string
   amount: string
   value: string
-  change: string
-  positive: boolean
+  change?: string
+  positive?: boolean
   icon: string
 }
 
@@ -26,7 +26,10 @@ export function TokenCard({ symbol, name, amount, value, change, positive, icon 
 
         <div className="plasmo-text-right">
           <p className="plasmo-font-semibold plasmo-text-card-foreground">{value}</p>
-          <p className={`plasmo-text-sm plasmo-font-medium ${positive ? "plasmo-text-primary" : "plasmo-text-destructive"}`}>{change}</p>
+          <p className="plasmo-text-sm plasmo-text-muted-foreground">{amount}</p>
+          {change !== undefined && positive !== undefined && (
+            <p className={`plasmo-text-xs plasmo-font-medium ${positive ? "plasmo-text-primary" : "plasmo-text-destructive"}`}>{change}</p>
+          )}
         </div>
       </div>
     </button>

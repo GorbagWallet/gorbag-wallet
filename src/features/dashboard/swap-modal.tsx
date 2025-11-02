@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { X, ArrowLeftRight, Settings } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Switch } from "~/components/ui/switch"
+import closeIcon from "data-base64:~assets/icons/icons8-close-24.png"
+import settingsIcon from "data-base64:~assets/icons/icons8-settings-24.png"
+import swapIcon from "data-base64:~assets/icons/icons8-thunder-24.png"
+import transferIcon from "data-base64:~assets/icons/icons8-data-transfer-24.png"
 
 interface SwapModalProps {
   open: boolean
@@ -39,10 +42,10 @@ export function SwapModal({ open, onClose }: SwapModalProps) {
           <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">Swap Tokens</h2>
           <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
             <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)} className="plasmo-rounded-xl">
-              <Settings className="plasmo-h-5 plasmo-w-5" />
+              <img src={settingsIcon} className="plasmo-h-5 plasmo-w-5" alt="Settings" />
             </Button>
             <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
-              <X className="plasmo-h-5 plasmo-w-5" />
+              <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt="Close" />
             </Button>
           </div>
         </div>
@@ -105,7 +108,7 @@ export function SwapModal({ open, onClose }: SwapModalProps) {
               onClick={handleSwitch}
               className="plasmo-rounded-full plasmo-h-10 plasmo-w-10 plasmo-bg-transparent"
             >
-              <ArrowLeftRight className="plasmo-h-4 plasmo-w-4" />
+              <img src={transferIcon} className="plasmo-h-4 plasmo-w-4" alt="Swap" />
             </Button>
           </div>
 
@@ -125,6 +128,7 @@ export function SwapModal({ open, onClose }: SwapModalProps) {
           </div>
 
           <Button className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium">
+            <img src={swapIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Swap" />
             Swap
           </Button>
         </div>

@@ -1,18 +1,19 @@
 "use client"
 
+import { useWallet } from "~/lib/wallet-context"
 import { useState } from "react"
 import { Label } from "~/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
 
 export function PreferencesSettings() {
-  const [currency, setCurrency] = useState("usd")
+  const { preferredCurrency, setPreferredCurrency } = useWallet()
   const [language, setLanguage] = useState("english")
 
   return (
     <div className="plasmo-space-y-6">
       <div>
         <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground plasmo-mb-3 plasmo-block">Preferred Currency</Label>
-        <Select value={currency} onValueChange={setCurrency}>
+        <Select value={preferredCurrency} onValueChange={setPreferredCurrency}>
           <SelectTrigger className="plasmo-h-12 plasmo-rounded-xl">
             <SelectValue />
           </SelectTrigger>
@@ -21,7 +22,7 @@ export function PreferencesSettings() {
             <SelectItem value="gbp">GBP - British Pound</SelectItem>
             <SelectItem value="ngn">NGN - Nigerian Naira</SelectItem>
             <SelectItem value="eur">EUR - Euro</SelectItem>
-            <SelectItem value="yen">JPY - Japanese Yen</SelectItem>
+            <SelectItem value="jpy">JPY - Japanese Yen</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { X, Copy, Check } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { useWallet } from "~/lib/wallet-context"
+import closeIcon from "data-base64:~assets/icons/icons8-close-24.png"
+import successIcon from "data-base64:~assets/icons/icons8-success-24.png"
+import copyIcon from "data-base64:~assets/icons/icons8-copy-24.png"
 
 interface ReceiveModalProps {
   open: boolean
@@ -30,7 +32,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
         <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-6">
           <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">Receive Tokens</h2>
           <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
-            <X className="plasmo-h-5 plasmo-w-5" />
+            <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt="Close" />
           </Button>
         </div>
 
@@ -53,7 +55,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
                 size="icon"
                 className="plasmo-rounded-xl plasmo-flex-shrink-0 plasmo-bg-transparent"
               >
-                {copied ? <Check className="plasmo-h-4 plasmo-w-4 plasmo-text-green-500" /> : <Copy className="plasmo-h-4 plasmo-w-4" />}
+                {copied ? <img src={successIcon} className="plasmo-h-4 plasmo-w-4 plasmo-text-green-500" alt="Copied" /> : <img src={copyIcon} className="plasmo-h-4 plasmo-w-4" alt="Copy" />}
               </Button>
             </div>
           </div>

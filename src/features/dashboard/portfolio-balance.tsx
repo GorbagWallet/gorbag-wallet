@@ -1,5 +1,6 @@
 "use client"
 
+import { currencySymbols } from "~/lib/currency";
 import { TrendingUp } from "lucide-react"
 import { useWallet } from "~/lib/wallet-context"
 
@@ -8,21 +9,11 @@ interface PortfolioBalanceProps {
   loading?: boolean;
 }
 
-const tokens = [
-  { id: "gor", value: 283382 },
-  { id: "sol", value: 89145 },
-  { id: "usdc", value: 25000 },
-  { id: "ray", value: 4313 },
-];
-
 export function PortfolioBalance({ hidden = false, loading = false }: PortfolioBalanceProps) {
-  const { isTokenHidden } = useWallet();
+  const { portfolioValue, preferredCurrency } = useWallet();
 
-  const totalBalance = tokens
-    .filter((token) => !isTokenHidden(token.id))
-    .reduce((sum, token) => sum + token.value, 0);
-
-  const formattedBalance = (totalBalance / 1000).toFixed(2);
+  const formattedBalance = (portfolioValue).toFixed(2);
+  const currencySymbol = currencySymbols[preferredCurrency] || "$";
 
   if (loading) {
     return (
@@ -38,7 +29,7 @@ export function PortfolioBalance({ hidden = false, loading = false }: PortfolioB
     <div className="plasmo-text-center plasmo-pb-6">
       <p className="plasmo-text-muted-foreground plasmo-text-sm plasmo-mb-2">Total Balance</p>
       <h1 className="plasmo-text-5xl plasmo-font-bold plasmo-text-foreground plasmo-mb-3 plasmo-text-balance plasmo-font-sans">
-        {hidden ? "****" : `${formattedBalance}K`}
+        {hidden ? "****" : `${currencySymbol}${formattedBalance}`}
       </h1>
       <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-text-primary">
         <TrendingUp className="plasmo-h-4 plasmo-w-4" />

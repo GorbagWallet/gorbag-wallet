@@ -1,11 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { X, ArrowRight, Check, AlertCircle, Loader2 } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { validateWalletAddress } from "~/lib/utils/wallet-utils"
+import successIcon from "data-base64:~assets/icons/icons8-success-24.png"
+import cancelIcon from "data-base64:~assets/icons/icons8-cancel-24.png"
+import closeIcon from "data-base64:~assets/icons/icons8-close-24.png"
+import continueIcon from "data-base64:~assets/icons/icons8-telegram-app-24.png"
+import validIcon from "data-base64:~assets/icons/icons8-success-24.png"  // Using success icon for valid status
+import invalidIcon from "data-base64:~assets/icons/icons8-cancel-24.png" // Using cancel icon for invalid status
 
 interface SendModalProps {
   open: boolean
@@ -61,7 +67,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
             <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-6">
               <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">Send Tokens</h2>
               <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
-                <X className="plasmo-h-5 plasmo-w-5" />
+                <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt="Close" />
               </Button>
             </div>
 
@@ -82,10 +88,10 @@ export function SendModal({ open, onClose }: SendModalProps) {
                     <Loader2 className="plasmo-absolute plasmo-right-3 plasmo-top-1/2 -plasmo-translate-y-1/2 plasmo-h-4 plasmo-w-4 plasmo-animate-spin plasmo-text-muted-foreground" />
                   )}
                   {addressValid === true && (
-                    <Check className="plasmo-absolute plasmo-right-3 plasmo-top-1/2 -plasmo-translate-y-1/2 plasmo-h-4 plasmo-w-4 plasmo-text-green-500" />
+                    <img src={validIcon} className="plasmo-absolute plasmo-right-3 plasmo-top-1/2 -plasmo-translate-y-1/2 plasmo-h-4 plasmo-w-4 plasmo-text-green-500" alt="Valid" />
                   )}
                   {addressValid === false && (
-                    <AlertCircle className="plasmo-absolute plasmo-right-3 plasmo-top-1/2 -plasmo-translate-y-1/2 plasmo-h-4 plasmo-w-4 plasmo-text-destructive" />
+                    <img src={invalidIcon} className="plasmo-absolute plasmo-right-3 plasmo-top-1/2 -plasmo-translate-y-1/2 plasmo-h-4 plasmo-w-4 plasmo-text-destructive" alt="Invalid" />
                   )}
                 </div>
               </div>
@@ -143,7 +149,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
                 className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium"
               >
                 Continue
-                <ArrowRight className="plasmo-h-4 plasmo-w-4 plasmo-ml-2" />
+                <img src={continueIcon} className="plasmo-h-4 plasmo-w-4 plasmo-ml-2" alt="Continue" />
               </Button>
             </div>
           </>
@@ -160,7 +166,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "success" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-green-500/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
-              <Check className="plasmo-h-6 plasmo-w-6 plasmo-text-green-500" />
+              <img src={successIcon} className="plasmo-h-6 plasmo-w-6" alt="Success" />
             </div>
             <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Sent!</h3>
             <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">Your tokens are on their way</p>
@@ -173,7 +179,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "failed" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-destructive/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
-              <AlertCircle className="plasmo-h-6 plasmo-w-6 plasmo-text-destructive" />
+              <img src={cancelIcon} className="plasmo-h-6 plasmo-w-6" alt="Cancel" />
             </div>
             <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Failed</h3>
             <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">Something went wrong</p>

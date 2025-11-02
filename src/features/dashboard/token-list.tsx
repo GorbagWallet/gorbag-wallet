@@ -3,11 +3,35 @@
 import { useWallet } from "~/lib/wallet-context"
 import { TokenCard } from "~/components/token-card"
 import { Button } from "~/components/ui/button"
-import { Eye } from "lucide-react"
 import { useState } from "react"
 import { HideTokenDrawer } from "./hide-token-drawer"
 
-import { gorbaganaTokens, solanaTokens } from "~/lib/token-data"
+// Import local token icons
+import solIcon from "data-base64:~assets/token-icons/sol.png"
+import gorIcon from "data-base64:~assets/token-icons/gor.jpg"
+import usdcIcon from "data-base64:~assets/token-icons/usdc.png"
+import usdtIcon from "data-base64:~assets/token-icons/usdt.png"
+import rayIcon from "data-base64:~assets/token-icons/ray.jpg"
+import jupIcon from "data-base64:~assets/token-icons/jup.png"
+import bonkIcon from "data-base64:~assets/token-icons/bonk.png"
+import eurcIcon from "data-base64:~assets/token-icons/eurc.jpg"
+
+// Import icons
+import eyeIcon from "data-base64:~assets/icons/icons8-eye-24.png"
+
+// Mapping of token symbols to imported icon data
+const localTokenIcons: Record<string, string> = {
+  SOL: solIcon,
+  GOR: gorIcon,
+  USDC: usdcIcon,
+  USDT: usdtIcon,
+  RAY: rayIcon,
+  JUP: jupIcon,
+  BONK: bonkIcon,
+  EURC: eurcIcon,
+};
+
+
 
 interface TokenListProps {
   loading?: boolean
@@ -29,11 +53,43 @@ function TokenCardSkeleton() {
   )
 }
 
-export function TokenList({ loading = false }: TokenListProps) {
-  const { isTokenHidden, network } = useWallet()
-  const [showHideDrawer, setShowHideDrawer] = useState(false)
+// Function to format token amount with proper decimals
+function formatTokenAmount(balance: number, decimals: number): string {
+  const amount = balance / (10 ** decimals);
+  // Format to show up to 6 decimal places, but remove trailing zeros
+  if (amount === 0) {
+    return '0';
+  } else if (amount < 0.000001 && amount > 0) {
+    return '<0.000001';
+  } else {
+    // Format with up to 6 decimal places, removing unnecessary trailing zeros
+    return amount.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 6,
+    });
+  }
+}
 
-  const tokens = network === "solana" ? solanaTokens : gorbaganaTokens
+// Function to get token icon with fallbacks
+function getTokenIcon(symbol: string, imageUrl?: string): string {
+  // First, try to use the local icon if available
+  const localIcon = localTokenIcons[symbol.toUpperCase()];
+  if (localIcon) {
+    return localIcon;
+  }
+
+  // If no local icon, try the provided image URL
+  if (imageUrl) {
+    return imageUrl;
+  }
+
+  // Fallback to a generic token icon or return a placeholder
+  return solIcon; // Use SOL as generic placeholder
+}
+
+export function TokenList({ loading = false }: TokenListProps) {
+  const { tokens, isTokenHidden } = useWallet()
+  const [showHideDrawer, setShowHideDrawer] = useState(false)
 
   const visibleTokens = tokens.filter((token) => !isTokenHidden(token.id))
 
@@ -47,7 +103,7 @@ export function TokenList({ loading = false }: TokenListProps) {
             size="sm"
             onClick={() => setShowHideDrawer(true)}
             className="plasmo-h-6 plasmo-px-2 plasmo-rounded-lg plasmo-text-xs hover:plasmo-bg-secondary">
-            <Eye className="plasmo-h-3.5 plasmo-w-3.5 plasmo-mr-1" />
+            <img src={eyeIcon} className="plasmo-h-3.5 plasmo-w-3.5 plasmo-mr-1" alt="Hide" />
             Hide
           </Button>
         </div>
@@ -57,7 +113,13 @@ export function TokenList({ loading = false }: TokenListProps) {
           <div>
             {visibleTokens.map((token) => (
               <div key={token.id} onClick={() => { /* Handle navigation to token details */ }} className="plasmo-mb-2">
-                <TokenCard {...token} />
+                <TokenCard 
+                  symbol={token.content.metadata.symbol} 
+                  name={token.content.metadata.name} 
+                  amount={formatTokenAmount(token.token_info.balance, token.token_info.decimals)} 
+                  value={token.value ? `${token.value.toFixed(2)}` : '$0.00'} 
+                  icon={getTokenIcon(token.content.metadata.symbol, token.content.links.image)} 
+                />
               </div>
             ))}
           </div>

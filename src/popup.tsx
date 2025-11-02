@@ -14,10 +14,12 @@ import { SwapModal } from "~/features/dashboard/swap-modal"
 import { WalletManagementPage } from "~/features/wallet-management/wallet-management-page"
 import ActivityPage from "~/features/dashboard/activity-page"
 import SettingsPage from "~/features/dashboard/settings/settings-page"
+import SwapPage from "~/features/swap/swap-page"
+import NftPage from "~/features/nft/nft-page"
 
 import "~style.css"
 
-function DashboardPage({ onNavigate }: { onNavigate: (view: string, walletId?: string) => void }) {
+function DashboardPage({ onNavigate, view }: { onNavigate: (view: string, walletId?: string) => void, view: string }) {
   const { activeWallet, loading } = useWallet()
   const [activeModal, setActiveModal] = useState<"send" | "receive" | "swap" | null>(null)
   const [balanceHidden, setBalanceHidden] = useState(false)
@@ -32,7 +34,7 @@ function DashboardPage({ onNavigate }: { onNavigate: (view: string, walletId?: s
           <TokenList loading={loading} />
         </div>
       </div>
-      <BottomNav />
+      <BottomNav onNavigate={onNavigate} view={view} />
 
       <SendModal open={activeModal === "send"} onClose={() => setActiveModal(null)} />
       <ReceiveModal open={activeModal === "receive"} onClose={() => setActiveModal(null)} />
@@ -44,7 +46,7 @@ function DashboardPage({ onNavigate }: { onNavigate: (view: string, walletId?: s
 const App = () => {
   const { activeWallet, loading } = useWallet()
   const [view, setView] = useState<
-    "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings"
+    "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings" | "swap" | "nft"
   >("loading")
   const [selectedWalletId, setSelectedWalletId] = useState<string | undefined>(undefined)
 
@@ -66,17 +68,21 @@ const App = () => {
   const renderView = () => {
     switch (view) {
       case "loading":
-        return <div>Loading Gorbag...</div>
+        return <DashboardPage onNavigate={handleNavigate} view={view} />;
       case "onboarding":
         return <Onboarding onDashboard={() => handleNavigate("dashboard")} />
       case "dashboard":
-        return <DashboardPage onNavigate={handleNavigate} />
+        return <DashboardPage onNavigate={handleNavigate} view={view} />
       case "walletManagement":
         return <WalletManagementPage walletId={selectedWalletId} onBack={() => handleNavigate("dashboard")} />
       case "activity":
         return <ActivityPage onBack={() => handleNavigate("dashboard")} />
       case "settings":
         return <SettingsPage onBack={() => handleNavigate("dashboard")} />
+      case "swap":
+        return <SwapPage onBack={() => handleNavigate("dashboard")} />
+      case "nft":
+        return <NftPage onBack={() => handleNavigate("dashboard")} />
       default:
         return <div>Loading...</div>
     }

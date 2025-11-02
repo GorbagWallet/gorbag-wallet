@@ -3,7 +3,9 @@
 import { useState } from "react"
 import { useWallet } from "~/lib/wallet-context"
 import { Button } from "~/components/ui/button"
-import { ChevronDown, History, MoreVertical } from "lucide-react"
+import { ChevronDown, MoreVertical } from "lucide-react"
+import activityIcon from "data-base64:~assets/icons/icons8-history-24.png"
+import settingsIcon from "data-base64:~assets/icons/icons8-settings-24.png"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,7 +64,9 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
           <Button variant="ghost" className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-auto plasmo-p-0">
             <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
               <div className="plasmo-w-8 plasmo-h-8 plasmo-rounded-full plasmo-bg-primary plasmo-flex plasmo-items-center plasmo-justify-center">
-                <span className="plasmo-text-primary-foreground plasmo-font-bold plasmo-text-sm">G</span>
+                <span className="plasmo-text-primary-foreground plasmo-font-bold plasmo-text-sm">
+                  {activeWallet?.nickname ? activeWallet.nickname.charAt(0).toUpperCase() : 'G'}
+                </span>
               </div>
               <div className="plasmo-text-left">
                 <p className="plasmo-text-sm plasmo-font-semibold plasmo-text-foreground">{activeWallet?.nickname}</p>
@@ -88,7 +92,9 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
                 className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-flex-1" // Take up available space
               >
                 <div className="plasmo-w-6 plasmo-h-6 plasmo-rounded-full plasmo-bg-primary plasmo-flex plasmo-items-center plasmo-justify-center">
-                  <span className="plasmo-text-primary-foreground plasmo-font-bold plasmo-text-xs">G</span>
+                  <span className="plasmo-text-primary-foreground plasmo-font-bold plasmo-text-xs">
+                    {wallet.nickname.charAt(0).toUpperCase()}
+                  </span>
                 </div>
                 <div className="plasmo-flex-1">
                   <p className="plasmo-text-sm plasmo-font-medium">{wallet.nickname}</p>
@@ -110,18 +116,10 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
 
       <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
         <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => onNavigate("activity")}>
-          <History className="plasmo-h-5 plasmo-w-5" />
+          <img src={activityIcon} className="plasmo-h-5 plasmo-w-5" alt="Activity" />
         </Button>
         <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => onNavigate("settings")}>
-          <svg className="plasmo-h-5 plasmo-w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-            />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <img src={settingsIcon} className="plasmo-h-5 plasmo-w-5" alt="Settings" />
         </Button>
       </div>
     </header>
