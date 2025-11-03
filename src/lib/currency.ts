@@ -171,6 +171,137 @@ export async function getTokenValue(token: Token, currency: string): Promise<num
   return 0;
 }
 
+// Additional function to get detailed token information
+export async function getTokenDetails(symbol: string, currency: string = "usd") {
+  const coinId = coinIdMap[symbol];
+  if (!coinId) {
+    return null;
+  }
+
+  // Try different APIs in sequence as fallbacks
+  const apis = [
+    { 
+      name: 'CoinGecko', 
+      fetch: async () => {
+        try {
+          const response = await fetch(
+            `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`
+          );
+          
+          if (!response.ok) {
+            throw new Error(`CoinGecko API error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Extract relevant information
+          const marketData = data.market_data;
+          const price = marketData.current_price?.[currency] || 0;
+          const priceChange24h = marketData.price_change_percentage_24h || 0;
+          const marketCap = marketData.market_cap?.[currency] || 0;
+          const totalVolume = marketData.total_volume?.[currency] || 0;
+          const circulatingSupply = marketData.circulating_supply || 0;
+          const totalSupply = marketData.total_supply || 0;
+
+          return {
+            symbol,
+            name: data.name,
+            price,
+            priceChange24h,
+            marketCap,
+            totalVolume,
+            circulatingSupply,
+            totalSupply,
+            image: data.image?.small || null,
+            lastUpdated: new Date().toISOString()
+          };
+        } catch (error) {
+          console.error(`Error with CoinGecko for ${symbol}:`, error);
+          throw error;
+        }
+      }
+    },
+    { 
+      name: 'Coinpaprika', 
+      fetch: async () => {
+        try {
+          // Coinpaprika uses different IDs, we'll need to map them
+          const coinpaprikaIdMap: { [key: string]: string } = {
+            SOL: "sol-solana",
+            GOR: "sol-solana", // Assuming GOR maps to SOL on coinpaprika too
+            USDC: "usdc-usd-coin",
+            USDT: "usdt-tether", 
+            RAY: "ray-raydium",
+            JUP: "jup-jupiter-aggregator-solana",
+            BONK: "bonk-bonk"
+          };
+          
+          const coinpaprikaId = coinpaprikaIdMap[symbol];
+          if (!coinpaprikaId) {
+            throw new Error(`No Coinpaprika mapping for ${symbol}`);
+          }
+          
+          const response = await fetch(`https://api.coinpaprika.com/v1/tickers/${coinpaprikaId}?quotes=${currency.toUpperCase()}`);
+          if (!response.ok) {
+            throw new Error(`Coinpaprika API error: ${response.status}`);
+          }
+          const data = await response.json();
+          
+          if (data?.quotes?.[currency.toUpperCase()]) {
+            const price = data.quotes[currency.toUpperCase()].price || 0;
+            const priceChange24h = data.quotes[currency.toUpperCase()].percent_change_24h || 0;
+            
+            return {
+              symbol,
+              name: data.name || symbol,
+              price,
+              priceChange24h,
+              marketCap: 0, // Coinpaprika response structure may differ
+              totalVolume: 0,
+              circulatingSupply: 0,
+              totalSupply: data.supply || 0,
+              image: null,
+              lastUpdated: new Date().toISOString()
+            };
+          }
+          throw new Error(`No data from Coinpaprika for ${symbol}`);
+        } catch (error) {
+          console.error(`Error with Coinpaprika for ${symbol}:`, error);
+          throw error;
+        }
+      }
+    }
+  ];
+
+  for (const api of apis) {
+    try {
+      const result = await api.fetch();
+      if (result && result.price !== 0) {
+        console.log(`${api.name} returned valid details for ${symbol}:`, result);
+        return result;
+      }
+    } catch (error) {
+      console.log(`Error with ${api.name} for ${symbol}:`, error);
+      // Continue to next API
+    }
+  }
+
+  console.error(`All APIs failed for ${symbol}, returning basic info`);
+  // If all APIs fail, return basic info
+  return {
+    symbol,
+    name: symbol,
+    price: 0,
+    priceChange24h: 0,
+    marketCap: 0,
+    totalVolume: 0,
+    circulatingSupply: 0,
+    totalSupply: 0,
+    image: null,
+    lastUpdated: new Date().toISOString()
+  };
+}
+
 export async function getPortfolioValue(
   tokens: Token[],
   currency: string

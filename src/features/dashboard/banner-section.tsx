@@ -22,6 +22,14 @@ export function BannerSection({ onClickNavigate }: BannerSectionProps) {
   // Mock banner data - in a real implementation, this would come from an API
   useEffect(() => {
     const mockBanners: BannerData[] = [
+      
+      {
+	title: "vBridge is Live",
+	description: "Bridge $sGOR to $gGOR",
+	mini_image: "https://s2.coinmarketcap.com/static/img/coins/64x64/36883.png",
+	background_image: "https://www.livebreathescotland.com/article_images/craigellachie-bridge-18.jpg",
+	onclick: "https://bridge.gorbagana.wtf"
+      },	
       {
         title: "Claim $XYZ Today",
         description: "Check your eligibility and claim $XYZ from the TGE",
