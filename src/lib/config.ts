@@ -1,7 +1,7 @@
 export const networks = {
   gorbagana: {
     rpc: "https://rpc.gorbagana.wtf",
-    explorer: "https://trashscan.xyz/tx/",
+    explorer: "https://trashscan.io/tx/",
     network: "testnet",
   },
   solana: {

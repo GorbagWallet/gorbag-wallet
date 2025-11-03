@@ -36,6 +36,8 @@ interface WalletContextType {
   toggleHiddenToken: (tokenId: string) => void;
   isTokenHidden: (tokenId: string) => boolean;
   signTransaction: (transaction: any) => Promise<any>;
+  getTransactionHistory: () => Promise<any[]>;
+  clearTransactionHistoryCache: () => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -96,6 +98,91 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       throw new Error("No seed phrase or private key available for signing");
+    }
+  }
+
+  // Cache for transaction history
+  const transactionHistoryCache = new Map();
+  
+  async function getTransactionHistory() {
+    if (!activeWallet) {
+      console.error("No active wallet available for fetching transaction history");
+      return [];
+    }
+
+    try {
+      const cacheKey = `${activeWallet.address}-${network}`;
+      const now = Date.now();
+      const cached = transactionHistoryCache.get(cacheKey);
+      
+      // Check if we have a valid cache (less than 10 minutes old)
+      if (cached && (now - cached.timestamp) < 10 * 60 * 1000) { // 10 minutes
+        console.log("Returning cached transaction history");
+        return cached.data;
+      }
+
+      console.log("Fetching transaction history for wallet:", activeWallet.address);
+      console.log("Using network:", network);
+      console.log("RPC URL:", networks[network].rpc);
+      
+      const rpcUrl = networks[network].rpc;
+      
+      // Import the solana module and fetch transaction signatures for the active wallet
+      const solanaModule = await import("~/lib/solana");
+      const signatures = await solanaModule.getTransactionHistory(activeWallet.address, rpcUrl);
+      
+      console.log("Fetched signatures:", signatures);
+      
+      // Limit to the first 10 transactions for performance
+      const transactionSignatures = signatures.slice(0, 10);
+      console.log("Limited signatures:", transactionSignatures);
+      
+      // Fetch detailed transaction information for each signature
+      const transactions = await Promise.all(
+        transactionSignatures.map(async (signatureInfo) => {
+          console.log("Fetching details for signature:", signatureInfo.signature);
+          const transaction = await solanaModule.getTransactionDetails(signatureInfo.signature, rpcUrl);
+          console.log("Transaction details:", transaction);
+          
+          // Return a simplified transaction object with relevant info
+          if (transaction) {
+            return {
+              signature: signatureInfo.signature,
+              slot: signatureInfo.slot,
+              blockTime: signatureInfo.blockTime,
+              confirmations: signatureInfo.confirmations,
+              transaction: transaction,
+              fee: transaction.meta?.fee,
+              status: transaction.meta?.err ? "failed" : "confirmed"
+            };
+          }
+          return null;
+        })
+      );
+
+      // Filter out any null transactions
+      const filteredTransactions = transactions.filter(tx => tx !== null);
+      console.log("Filtered transactions:", filteredTransactions);
+
+      // Cache the results
+      transactionHistoryCache.set(cacheKey, {
+        data: filteredTransactions,
+        timestamp: now
+      });
+
+      return filteredTransactions;
+    } catch (error) {
+      console.error("Error fetching transaction history:", error);
+      return [];
+    }
+  }
+
+  // Function to clear the transaction history cache (to be called after a transaction)
+  function clearTransactionHistoryCache() {
+    if (activeWallet) {
+      const cacheKey = `${activeWallet.address}-${network}`;
+      transactionHistoryCache.delete(cacheKey);
+      console.log("Cleared transaction history cache for:", cacheKey);
     }
   }
 
@@ -294,6 +381,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         preferredCurrency,
         setPreferredCurrency,
         signTransaction,
+        getTransactionHistory,
+        clearTransactionHistoryCache,
       }}>
       {children}
     </WalletContext.Provider>

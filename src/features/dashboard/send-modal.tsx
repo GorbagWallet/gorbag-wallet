@@ -25,7 +25,7 @@ interface SendModalProps {
 type SendStep = "input" | "simulation" | "signing" | "success" | "failed"
 
 export function SendModal({ open, onClose }: SendModalProps) {
-  const { activeWallet, tokens, network, balance, signTransaction } = useWallet()
+  const { activeWallet, tokens, network, balance, signTransaction, clearTransactionHistoryCache } = useWallet()
   const [step, setStep] = useState<SendStep>("input")
   const [address, setAddress] = useState("")
   const [amount, setAmount] = useState("")
@@ -164,8 +164,11 @@ export function SendModal({ open, onClose }: SendModalProps) {
     } catch (err) {
       console.error("Fee estimation error:", err);
       setError(err instanceof Error ? err.message : "Could not estimate transaction fees");
+      // Even if the simulation fails, clear the cache to refresh any potential state
+      clearTransactionHistoryCache();
       setStep("failed")
     }
+  }
   }
 
   const handleSignAndConfirm = async () => {
@@ -215,10 +218,15 @@ export function SendModal({ open, onClose }: SendModalProps) {
       const txHash = await connection.sendRawTransaction(signedTransaction.serialize());
       setTxHash(txHash);
       
+      // Clear the transaction history cache after a successful transaction
+      clearTransactionHistoryCache();
+      
       setStep("success")
     } catch (err) {
       console.error("Transaction signing error:", err);
       setError(err instanceof Error ? err.message : "Transaction signing failed");
+      // Even if the transaction fails, clear the cache so the user knows something happened
+      clearTransactionHistoryCache();
       setStep("failed")
     }
   }
