@@ -126,7 +126,16 @@ export function TokenList({ loading = false }: TokenListProps) {
         )}
       </div>
 
-      <HideTokenDrawer open={showHideDrawer} onOpenChange={setShowHideDrawer} tokens={tokens} />
+      <HideTokenDrawer 
+        open={showHideDrawer} 
+        onOpenChange={setShowHideDrawer} 
+        tokens={tokens.map(token => ({
+          id: token.id,
+          symbol: token.content.metadata.symbol,
+          name: token.content.metadata.name,
+          icon: getTokenIcon(token.content.metadata.symbol, token.content.links.image)
+        }))} 
+      />
     </>
   )
 }
