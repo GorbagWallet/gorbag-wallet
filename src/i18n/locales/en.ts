@@ -226,5 +226,28 @@ export const en = {
     title: "NFTs",
     comingSoon: "Coming Soon",
     description: "NFT support is coming to Gorbag Wallet"
+  },
+  token: {
+    title: "Token Details",
+    tokenNotFound: "Token Not Found",
+    tokenNotFoundDescription: "The requested token could not be found in your wallet",
+    overview: "Overview",
+    activity: "Activity",
+    tokenInfo: "Token Info",
+    symbol: "Symbol",
+    name: "Name",
+    decimals: "Decimals",
+    totalSupply: "Total Supply",
+    priceInfo: "Price Info",
+    price: "Price",
+    "24hChange": "24h Change",
+    marketCap: "Market Cap",
+    noActivity: "No activity yet",
+    buy: "Buy",
+    sell: "Sell"
+  },
+  banner: {
+    claim: "Claim",
+    learnMore: "Learn More"
   }
 };

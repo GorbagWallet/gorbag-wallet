@@ -54,7 +54,7 @@ export function ActionButtons({ onAction }: ActionButtonsProps) {
               </p>
               <Button
                 onClick={() => setShowNetworkWarning(false)}
-                className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium">
+                className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium plasmo-animate-pop">
                 {t("common.goBackHome")}
               </Button>
             </div>

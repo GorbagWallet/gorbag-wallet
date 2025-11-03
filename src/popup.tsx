@@ -18,13 +18,19 @@ import SettingsPage from "~/features/dashboard/settings/settings-page"
 import SwapPage from "~/features/swap/swap-page"
 import NftPage from "~/features/dashboard/nft-page"
 import { WalletLockScreen } from "~/components/wallet-lock-screen"
+import TokenPage from "~/features/dashboard/token-page"
+import { BannerSection } from "~/features/dashboard/banner-section"
 
 import "~style.css"
 
-function DashboardPage({ onNavigate, onRefresh, view }: { onNavigate: (view: string, walletId?: string) => void, onRefresh?: () => void, view: string }) {
+function DashboardPage({ onNavigate, onRefresh, view }: { onNavigate: (view: string, walletId?: string, shouldRefresh?: boolean, tokenSymbol?: string) => void, onRefresh?: () => void, view: string }) {
   const { activeWallet, loading } = useWallet()
   const [activeModal, setActiveModal] = useState<"send" | "receive" | "swap" | null>(null)
   const [balanceHidden, setBalanceHidden] = useState(false)
+
+  const navigateToToken = (tokenSymbol: string) => {
+    onNavigate("token", undefined, false, tokenSymbol);
+  }
 
   return (
     <div className="plasmo-h-full plasmo-px-4 plasmo-flex plasmo-flex-col plasmo-relative">
@@ -33,7 +39,8 @@ function DashboardPage({ onNavigate, onRefresh, view }: { onNavigate: (view: str
         <div>
           <PortfolioBalance hidden={balanceHidden} loading={loading} />
           <ActionButtons onAction={setActiveModal} />
-          <TokenList loading={loading} />
+          <BannerSection />
+          <TokenList loading={loading} onNavigateToToken={navigateToToken} />
         </div>
       </div>
       <BottomNav onNavigate={onNavigate} onRefresh={onRefresh} view={view} />
@@ -48,13 +55,15 @@ function DashboardPage({ onNavigate, onRefresh, view }: { onNavigate: (view: str
 const App = () => {
   const { activeWallet, loading, refreshBalances } = useWallet()
   const [view, setView] = useState<
-    "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings" | "swap" | "nft"
+    "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings" | "swap" | "nft" | "token"
   >("loading")
   const [selectedWalletId, setSelectedWalletId] = useState<string | undefined>(undefined)
+  const [selectedTokenSymbol, setSelectedTokenSymbol] = useState<string | undefined>(undefined)
 
-  const handleNavigate = (newView: string, walletId?: string, shouldRefresh?: boolean) => {
+  const handleNavigate = (newView: string, walletId?: string, shouldRefresh?: boolean, tokenSymbol?: string) => {
     setSelectedWalletId(walletId)
-    setView(newView as "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings")
+    setSelectedTokenSymbol(tokenSymbol)
+    setView(newView as "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings" | "token")
     if (shouldRefresh && newView === "dashboard") {
       refreshBalances();
     }
@@ -88,6 +97,11 @@ const App = () => {
         return <SwapPage onBack={() => handleNavigate("dashboard") } />;
       case "nft":
         return <NftPage onBack={() => handleNavigate("dashboard") } />;
+      case "token":
+        if (selectedTokenSymbol) {
+          return <TokenPage tokenSymbol={selectedTokenSymbol} onBack={() => handleNavigate("dashboard") } />;
+        }
+        return <div>Loading...</div>;
       default:
         return <div>Loading...</div>;
     }

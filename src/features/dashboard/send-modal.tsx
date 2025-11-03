@@ -322,7 +322,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
               <Button
                 onClick={handleContinue}
                 disabled={!address || !amount || addressValid !== true || parseFloat(amount) <= 0 || parseFloat(amount) > nativeTokenAmount}
-                className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium"
+                className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium plasmo-animate-pop"
               >
                 {t("common.continue")}
                 <img src={continueIcon} className="plasmo-h-4 plasmo-w-4 plasmo-ml-2" alt={t("common.continue")} />
@@ -355,7 +355,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
               <p className="plasmo-text-xs plasmo-text-muted-foreground">{t("send.from", { amount, symbol: network === "gorbagana" ? "GOR" : "SOL", address: `${address.substring(0, 6)}...${address.substring(address.length - 4)}` })}</p>
             </div>
             <div className="plasmo-w-full plasmo-space-y-3">
-              <Button onClick={handleSignAndConfirm} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium">
+              <Button onClick={handleSignAndConfirm} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium plasmo-animate-pop">
                 {t("send.signAndConfirm")}
               </Button>
               <Button 
@@ -401,7 +401,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
                 </a>
               </div>
             )}
-            <Button onClick={onClose} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl">
+            <Button onClick={onClose} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-animate-pop">
               {t("send.done")}
             </Button>
           </div>
@@ -427,10 +427,10 @@ export function SendModal({ open, onClose }: SendModalProps) {
                 </a>
               </div>
             )}
-            <Button onClick={() => setStep("input")} variant="outline" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-mb-2">
+            <Button onClick={() => setStep("input")} variant="outline" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-mb-2 plasmo-animate-pop">
               {t("common.tryAgain")}
             </Button>
-            <Button onClick={onClose} variant="ghost" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl">
+            <Button onClick={onClose} variant="ghost" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-animate-pop">
               {t("common.close")}
             </Button>
           </div>

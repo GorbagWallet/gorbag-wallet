@@ -226,5 +226,28 @@ export const da = {
     title: "NFT'er",
     comingSoon: "Kommer snart",
     description: "NFT-support kommer til Gorbag Wallet"
+  },
+  token: {
+    title: "Token-detaljer",
+    tokenNotFound: "Token ikke fundet",
+    tokenNotFoundDescription: "Den ønskede token blev ikke fundet i din tegnebog",
+    overview: "Oversigt",
+    activity: "Aktivitet",
+    tokenInfo: "Token-info",
+    symbol: "Symbol",
+    name: "Navn",
+    decimals: "Decimaler",
+    totalSupply: "Samlet udbud",
+    priceInfo: "Prisinfo",
+    price: "Pris",
+    "24hChange": "24t ændring",
+    marketCap: "Markedskapitalisering",
+    noActivity: "Ingen aktivitet endnu",
+    buy: "Køb",
+    sell: "Sælg"
+  },
+  banner: {
+    claim: "Gør krav",
+    learnMore: "Lær mere"
   }
 };

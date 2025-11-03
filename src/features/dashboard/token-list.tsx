@@ -36,6 +36,7 @@ const localTokenIcons: Record<string, string> = {
 
 interface TokenListProps {
   loading?: boolean
+  onNavigateToToken?: (tokenSymbol: string) => void
 }
 
 function TokenCardSkeleton() {
@@ -88,7 +89,7 @@ function getTokenIcon(symbol: string, imageUrl?: string): string {
   return solIcon; // Use SOL as generic placeholder
 }
 
-export function TokenList({ loading = false }: TokenListProps) {
+export function TokenList({ loading = false, onNavigateToToken }: TokenListProps) {
   const { t } = useI18n()
   const { tokens, isTokenHidden } = useWallet()
   const [showHideDrawer, setShowHideDrawer] = useState(false)
@@ -114,13 +115,14 @@ export function TokenList({ loading = false }: TokenListProps) {
         ) : (
           <div>
             {visibleTokens.map((token) => (
-              <div key={token.id} onClick={() => { /* Handle navigation to token details */ }} className="plasmo-mb-2">
+              <div key={token.id} className="plasmo-mb-2">
                 <TokenCard 
                   symbol={token.content.metadata.symbol} 
                   name={token.content.metadata.name} 
                   amount={formatTokenAmount(token.token_info.balance, token.token_info.decimals)} 
                   value={token.value ? `${token.value.toFixed(2)}` : '$0.00'} 
                   icon={getTokenIcon(token.content.metadata.symbol, token.content.links.image)} 
+                  onClick={onNavigateToToken ? () => onNavigateToToken(token.content.metadata.symbol) : undefined}
                 />
               </div>
             ))}

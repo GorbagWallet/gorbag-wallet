@@ -12,7 +12,7 @@ export function BottomNav({ onNavigate, onRefresh, view }: { onNavigate: (view: 
       <div className="plasmo-w-11/12 plasmo-flex plasmo-items-center plasmo-justify-around plasmo-h-20 plasmo-rounded-2xl" style={{ backgroundColor: '#12140e' }}>
         <Button
           size="icon"
-          className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 ${view === "dashboard" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
+          className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 plasmo-animate-pop ${view === "dashboard" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
           onClick={() => {
             onNavigate("dashboard", undefined, true); // Navigate to dashboard and trigger refresh
             if (onRefresh) onRefresh(); // Call the refresh function if provided
@@ -22,14 +22,14 @@ export function BottomNav({ onNavigate, onRefresh, view }: { onNavigate: (view: 
         </Button>
         <Button
           size="icon"
-          className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 ${view === "swap" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
+          className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 plasmo-animate-pop ${view === "swap" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
           onClick={() => onNavigate("swap")}
         >
           <img src={thunderIcon} className="plasmo-h-5 plasmo-w-5" alt={t("wallet.swapTokens")} />
         </Button>
         <Button
           size="icon"
-          className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 ${view === "nft" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
+          className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 plasmo-animate-pop ${view === "nft" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
           onClick={() => onNavigate("nft")}
         >
           <img src={galleryIcon} className="plasmo-h-5 plasmo-w-5" alt={t("nft.title")} />

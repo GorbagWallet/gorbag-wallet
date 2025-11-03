@@ -58,7 +58,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
       <div className="plasmo-bg-card plasmo-w-full plasmo-max-w-md plasmo-rounded-t-3xl sm:plasmo-rounded-3xl plasmo-p-6 plasmo-animate-in plasmo-slide-in-from-bottom duration-300 sm:plasmo-slide-in-bottom-0">
         <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-6">
           <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">{t("receive.title")}</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
+          <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl plasmo-animate-pop">
             <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt={t("common.close")} />
           </Button>
         </div>
@@ -99,7 +99,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
 
           <Button
             onClick={copyAddress}
-            className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-flex plasmo-items-center plasmo-justify-center">
+            className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-flex plasmo-items-center plasmo-justify-center plasmo-animate-pop">
             {copied ? (
               <>
                 <img src={successIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt={t("common.copied")} />

@@ -220,11 +220,34 @@ export const fr = {
       word: "Mot #{{index}}",
       placeholder: "Entrez le mot #{{index}}",
       verify: "Vérifier la phrase"
-    },
-    nft: {
-      title: "NFTs",
-      comingSoon: "Bientôt disponible",
-      description: "Le support NFT arrive sur Gorbag Wallet"
     }
+  },
+  nft: {
+    title: "NFTs",
+    comingSoon: "Bientôt disponible",
+    description: "Le support NFT arrive sur Gorbag Wallet"
+  },
+  token: {
+    title: "Détails du token",
+    tokenNotFound: "Token non trouvé",
+    tokenNotFoundDescription: "Le token demandé n'a pas été trouvé dans votre portefeuille",
+    overview: "Vue d'ensemble",
+    activity: "Activité",
+    tokenInfo: "Informations sur le token",
+    symbol: "Symbole",
+    name: "Nom",
+    decimals: "Décimales",
+    totalSupply: "Offre totale",
+    priceInfo: "Informations sur le prix",
+    price: "Prix",
+    "24hChange": "Changement sur 24h",
+    marketCap: "Capitalisation boursière",
+    noActivity: "Aucune activité pour le moment",
+    buy: "Acheter",
+    sell: "Vendre"
+  },
+  banner: {
+    claim: "Réclamer",
+    learnMore: "En savoir plus"
   }
 };
