@@ -9,6 +9,7 @@ import { validateWalletAddress } from "~/lib/utils/wallet-utils"
 import { useWallet } from "~/lib/wallet-context"
 import { networks } from "~/lib/config"
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js"
+import { useI18n } from "~/i18n/context"
 import successIcon from "data-base64:~assets/icons/icons8-success-24.png"
 import cancelIcon from "data-base64:~assets/icons/icons8-cancel-24.png"
 import errorIcon from "data-base64:~assets/icons/icons8-error-24.png"
@@ -25,6 +26,7 @@ interface SendModalProps {
 type SendStep = "input" | "simulation" | "signing" | "success" | "failed"
 
 export function SendModal({ open, onClose }: SendModalProps) {
+  const { t } = useI18n()
   const { activeWallet, tokens, network, balance, signTransaction, clearTransactionHistoryCache } = useWallet()
   const [step, setStep] = useState<SendStep>("input")
   const [address, setAddress] = useState("")
@@ -322,7 +324,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
                 className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium"
               >
                 {t("common.continue")}
-                <img src={continueIcon} className="plasmo-h-4 plasmo-w-4 plasmo-ml-2" alt="Continue" />
+                <img src={continueIcon} className="plasmo-h-4 plasmo-w-4 plasmo-ml-2" alt={t("common.continue")} />
               </Button>
             </div>
           </>
@@ -331,31 +333,31 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "simulation" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <Loader2 className="plasmo-h-12 plasmo-w-12 plasmo-animate-spin plasmo-text-primary plasmo-mb-4" />
-            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Simulating Transaction</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground">Checking transaction viability...</p>
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.simulation")}</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground">{t("send.checkingViability")}</p>
           </div>
         )}
 
         {step === "signing" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12 plasmo-space-y-6">
             <div className="plasmo-w-16 plasmo-h-16 plasmo-rounded-full plasmo-bg-primary/10 plasmo-flex plasmo-items-center plasmo-justify-center">
-              <img src={successIcon} className="plasmo-h-8 plasmo-w-8" alt="Simulated" />
+              <img src={successIcon} className="plasmo-h-8 plasmo-w-8" alt={t("send.simulated")} />
             </div>
             <div className="plasmo-text-center">
-              <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Simulated</h3>
-              <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-4">Simulation successful</p>
-              <p className="plasmo-text-xs plasmo-text-muted-foreground">Sending {amount} {network === "gorbagana" ? "GOR" : "SOL"} to {address.substring(0, 6)}...{address.substring(address.length - 4)}</p>
+              <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.simulated")}</h3>
+              <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-4">{t("send.simulationSuccess")}</p>
+              <p className="plasmo-text-xs plasmo-text-muted-foreground">{t("send.from", { amount, symbol: network === "gorbagana" ? "GOR" : "SOL", address: `${address.substring(0, 6)}...${address.substring(address.length - 4)}` })}</p>
             </div>
             <div className="plasmo-w-full plasmo-space-y-3">
               <Button onClick={handleSignAndConfirm} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium">
-                Sign & Confirm Transaction
+                {t("send.signAndConfirm")}
               </Button>
               <Button 
                 onClick={() => setStep("input")} 
                 variant="outline" 
                 className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl"
               >
-                Cancel
+                {t("send.cancel")}
               </Button>
             </div>
           </div>
@@ -364,21 +366,21 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "sending" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <Loader2 className="plasmo-h-12 plasmo-w-12 plasmo-animate-spin plasmo-text-primary plasmo-mb-4" />
-            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Confirming Transaction</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground">Please confirm in wallet...</p>
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.confirming")}</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground">{t("send.pleaseConfirm")}</p>
           </div>
         )}
 
         {step === "success" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-green-500/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
-              <img src={successIcon} className="plasmo-h-6 plasmo-w-6" alt="Success" />
+              <img src={successIcon} className="plasmo-h-6 plasmo-w-6" alt={t("send.transactionConfirmed")} />
             </div>
-            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Confirmed!</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">Your tokens have been sent</p>
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.transactionConfirmed")}</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">{t("send.tokensSent")}</p>
             {txHash && (
               <div className="plasmo-mb-4 plasmo-text-center">
-                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mb-1">Transaction Hash</p>
+                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mb-1">{t("activity.transactionHash")}</p>
                 <a 
                   href={`${networks[network].explorer}${txHash}`} 
                   target="_blank" 
@@ -390,7 +392,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
               </div>
             )}
             <Button onClick={onClose} className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl">
-              Done
+              {t("send.done")}
             </Button>
           </div>
         )}
@@ -398,7 +400,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "failed" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-destructive/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
-              <img src={errorIcon} className="plasmo-h-6 plasmo-w-6" alt="Error" />
+              <img src={errorIcon} className="plasmo-h-6 plasmo-w-6" alt={t("common.error")} />
             </div>
             <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.transactionFailed")}</h3>
             <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">{error || t("send.somethingWentWrong")}</p>

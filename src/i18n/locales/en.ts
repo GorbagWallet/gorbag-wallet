@@ -16,7 +16,9 @@ export const en = {
     success: "Success",
     failed: "Failed",
     tryAgain: "Try Again",
-    max: "MAX"
+    max: "MAX",
+    goBackHome: "Go Back Home",
+    welcome: "Welcome"
   },
   wallet: {
     title: "Gorbag Wallet",
@@ -33,7 +35,10 @@ export const en = {
     hideTokens: "Hide Tokens",
     network: "Network",
     networkSolana: "Solana Network",
-    networkGorbagana: "Gorbagana Network"
+    networkGorbagana: "Gorbagana Network",
+    viewDetails: "View Details",
+    addWallet: "+ Add Wallet",
+    swapTokens: "Swap Tokens"
   },
   send: {
     title: "Send Tokens",
@@ -59,7 +64,9 @@ export const en = {
     simulationSuccess: "Simulation successful",
     from: "Sending {{amount}} {{symbol}} to {{address}}",
     confirming: "Confirming Transaction",
-    pleaseConfirm: "Please confirm in wallet..."
+    pleaseConfirm: "Please confirm in wallet...",
+    cancel: "Cancel",
+    done: "Done"
   },
   receive: {
     title: "Receive Tokens",
@@ -145,6 +152,12 @@ export const en = {
     es: "Spanish"
   },
   onboarding: {
+    createWallet: "Create New Wallet",
+    importWallet: "Import Wallet",
+    subtitle: "The Gorbagana Wallet",
+    welcomeMessage: "Gorbagio {{nickname}}!",
+    takeTour: "Take Tour",
+    skip: "Skip",
     importKey: {
       back: "Back",
       title: "Enter Your Seed Phrase",

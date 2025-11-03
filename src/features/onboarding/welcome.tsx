@@ -1,4 +1,5 @@
 import { Button } from "~/components/ui/button"
+import { useI18n } from "~/i18n/context"
 import icon from "data-base64:~assets/icon.png"
 import { useState } from "react"
 
@@ -8,6 +9,7 @@ interface WelcomeProps {
 }
 
 export function Welcome({ onSelectCreate, onSelectImport }: WelcomeProps) {
+  const { t } = useI18n()
   const [isCreateAnimating, setCreateAnimating] = useState(false)
   const [isImportAnimating, setImportAnimating] = useState(false)
 
@@ -32,13 +34,13 @@ export function Welcome({ onSelectCreate, onSelectImport }: WelcomeProps) {
       <div className="plasmo-w-full plasmo-max-w-md">
         <div className="plasmo-text-center plasmo-mb-8">
           <div className="plasmo-w-16 plasmo-h-16 plasmo-rounded-full plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mx-auto plasmo-mb-4">
-            <img src={icon} alt="Gorbag Logo" className="plasmo-w-16 plasmo-h-16 plasmo-rounded-xl" />
+            <img src={icon} alt={t("wallet.title")} className="plasmo-w-16 plasmo-h-16 plasmo-rounded-xl" />
           </div>
           <h1 className="plasmo-text-3xl plasmo-font-bold plasmo-text-foreground plasmo-mb-2">
-            Gorbag Wallet
+            {t("wallet.title")}
           </h1>
           <p className="plasmo-text-muted-foreground">
-            The Gorbagana Wallet 
+            {t("onboarding.subtitle")}
           </p>
         </div>
 
@@ -49,7 +51,7 @@ export function Welcome({ onSelectCreate, onSelectImport }: WelcomeProps) {
             className={`plasmo-w-full plasmo-h-12 plasmo-text-base ${
               isCreateAnimating ? "animate-pop" : ""
             }`}>
-            Create New Wallet
+            {t("onboarding.createWallet")}
           </Button>
           <Button
             onClick={handleImportClick}
@@ -58,7 +60,7 @@ export function Welcome({ onSelectCreate, onSelectImport }: WelcomeProps) {
             className={`plasmo-w-full plasmo-h-12 plasmo-text-base plasmo-bg-transparent ${
               isImportAnimating ? "animate-pop" : ""
             }`}>
-            Import Wallet
+            {t("onboarding.importWallet")}
           </Button>
         </div>
 

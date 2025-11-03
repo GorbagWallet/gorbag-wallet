@@ -63,21 +63,3 @@ export function NicknameStep({ onNext, onBack }: NicknameStepProps) {
     </div>
   );
 }
-t.value)}
-            className="plasmo-h-16"
-          />
-        </div>
-
-        <Button
-          onClick={handleNextClick}
-          disabled={!nickname.trim()}
-          size="lg"
-          className={`plasmo-w-full plasmo-h-12 ${
-            isAnimating ? "animate-pop" : ""
-          }`}>
-          Continue
-        </Button>
-      </div>
-    </div>
-  );
-}

@@ -13,10 +13,12 @@ export const fr = {
     settings: "Paramètres",
     loading: "Chargement...",
     error: "Erreur",
-    success: "Succès",
+    success: "Succes",
     failed: "Échec",
     tryAgain: "Réessayer",
-    max: "MAX"
+    max: "MAX",
+    goBackHome: "Retourner à l'accueil",
+    welcome: "Bienvenue"
   },
   wallet: {
     title: "Portefeuille Gorbag",
@@ -33,7 +35,10 @@ export const fr = {
     hideTokens: "Masquer les jetons",
     network: "Réseau",
     networkSolana: "Réseau Solana",
-    networkGorbagana: "Réseau Gorbagana"
+    networkGorbagana: "Réseau Gorbagana",
+    viewDetails: "Voir les détails",
+    addWallet: "+ Ajouter un portefeuille",
+    swapTokens: "Échanger des jetons"
   },
   send: {
     title: "Envoyer des jetons",
@@ -59,7 +64,9 @@ export const fr = {
     simulationSuccess: "Simulation réussie",
     from: "Envoi de {{amount}} {{symbol}} à {{address}}",
     confirming: "Confirmation de la transaction",
-    pleaseConfirm: "Veuillez confirmer dans le portefeuille..."
+    pleaseConfirm: "Veuillez confirmer dans le portefeuille...",
+    cancel: "Annuler",
+    done: "Terminé"
   },
   receive: {
     title: "Recevoir des jetons",
@@ -145,6 +152,12 @@ export const fr = {
     es: "Espagnol"
   },
   onboarding: {
+    createWallet: "Créer un nouveau portefeuille",
+    importWallet: "Importer le portefeuille",
+    subtitle: "Le portefeuille Gorbagana",
+    welcomeMessage: "Gorbagio {{nickname}}!",
+    takeTour: "Faire la visite",
+    skip: "Passer",
     importKey: {
       back: "Retour",
       title: "Entrez votre phrase de départ",

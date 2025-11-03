@@ -22,7 +22,7 @@ export function CreateWalletFlow({ onBack, onDashboard }: CreateWalletFlowProps)
   const [step, setStep] = useState<CreateStep>("nickname");
   const [nickname, setNickname] = useState("");
   const [seedPhrase, setSeedPhrase] = useState<string[]>([]);
-  const { addWallet } = useWallet();
+  const { addWallet, setActiveWallet, wallets } = useWallet();
 
   useEffect(() => {
     if (step === "loading") {
@@ -42,7 +42,7 @@ export function CreateWalletFlow({ onBack, onDashboard }: CreateWalletFlowProps)
             privateKey: bs58.encode(keypair.secretKey),
             createdAt: Date.now(),
           };
-          addWallet(wallet);
+          addWallet(wallet, false); // Don't set as active yet, let user go through post-onboarding
           setStep("postOnboarding");
         } catch (error) {
           console.error("Error creating wallet:", error);
@@ -82,7 +82,17 @@ export function CreateWalletFlow({ onBack, onDashboard }: CreateWalletFlowProps)
       )}
       {step === "loading" && <SetupLoadingStep />}
       {step === "postOnboarding" && (
-        <PostOnboarding onComplete={onDashboard} />
+        <PostOnboarding 
+          nickname={nickname}
+          onComplete={() => {
+            // Set the most recently added wallet as active
+            const lastWallet = wallets[wallets.length - 1];
+            if (lastWallet) {
+              setActiveWallet(lastWallet);
+            }
+            onDashboard();
+          }} 
+        />
       )}
     </div>
   );

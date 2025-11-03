@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useWallet } from "~/lib/wallet-context"
 import { Button } from "~/components/ui/button"
 import { ChevronDown, MoreVertical } from "lucide-react"
+import { useI18n } from "~/i18n/context"
 import activityIcon from "data-base64:~assets/icons/icons8-history-24.png"
 import settingsIcon from "data-base64:~assets/icons/icons8-settings-24.png"
 import {
@@ -26,6 +27,7 @@ interface WalletOptionsDropdownProps {
 }
 
 function WalletOptionsDropdown({ walletId, onNavigate }: WalletOptionsDropdownProps) {
+  const { t } = useI18n()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,7 +37,7 @@ function WalletOptionsDropdown({ walletId, onNavigate }: WalletOptionsDropdownPr
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="plasmo-w-40">
         <DropdownMenuItem onClick={() => onNavigate("walletManagement", walletId)}>
-          View Details
+          {t("wallet.viewDetails")}
         </DropdownMenuItem>
         {/* Add other options here later if needed */}
       </DropdownMenuContent>
@@ -45,6 +47,7 @@ function WalletOptionsDropdown({ walletId, onNavigate }: WalletOptionsDropdownPr
 
 export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: DashboardHeaderProps) {
   const { wallets, activeWallet, setActiveWallet, deleteWallet } = useWallet()
+  const { t } = useI18n()
   const [open, setOpen] = useState(false)
 
   const handleAddWallet = () => {
@@ -109,17 +112,17 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
           ))}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleAddWallet} className="plasmo-cursor-pointer">
-            <span className="plasmo-text-primary">+ Add Wallet</span>
+            <span className="plasmo-text-primary">{t("wallet.addWallet")}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
         <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => onNavigate("activity")}>
-          <img src={activityIcon} className="plasmo-h-5 plasmo-w-5" alt="Activity" />
+          <img src={activityIcon} className="plasmo-h-5 plasmo-w-5" alt={t("wallet.activity")} />
         </Button>
         <Button variant="ghost" size="icon" className="plasmo-rounded-xl" onClick={() => onNavigate("settings")}>
-          <img src={settingsIcon} className="plasmo-h-5 plasmo-w-5" alt="Settings" />
+          <img src={settingsIcon} className="plasmo-h-5 plasmo-w-5" alt={t("settings.title")} />
         </Button>
       </div>
     </header>

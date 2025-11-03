@@ -7,6 +7,7 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Switch } from "~/components/ui/switch"
 import { useWallet } from "~/lib/wallet-context"
+import { useI18n } from "~/i18n/context"
 
 // Import local token icons
 import solIcon from "data-base64:~assets/token-icons/sol.png"
@@ -38,6 +39,7 @@ interface SwapPageProps {
 }
 
 export default function SwapPage({ onBack }: SwapPageProps) {
+  const { t } = useI18n()
   const { activeWallet, tokens, balance, network } = useWallet()
   const [fromToken, setFromToken] = useState("GOR")
   const [toToken, setToToken] = useState("SOL")
@@ -96,7 +98,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
         <Button variant="ghost" size="icon" onClick={onBack} className="plasmo-rounded-xl">
           <ArrowLeft className="plasmo-h-5 plasmo-w-5" />
         </Button>
-        <h1 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">Swap</h1>
+        <h1 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">{t("swap.title")}</h1>
         <Button 
           variant="ghost" 
           size="icon" 
@@ -111,7 +113,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
         <div className="plasmo-mx-4 plasmo-mt-4 plasmo-bg-card plasmo-rounded-xl plasmo-p-4 plasmo-space-y-4">
           <div>
             <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground plasmo-mb-2 plasmo-block">
-              Slippage Tolerance
+              {t("swap.slippage")}
             </Label>
             <div className="plasmo-relative">
               <div className="plasmo-absolute plasmo-left-3 plasmo-top-1/2 plasmo-transform plasmo--translate-y-1/2 plasmo-text-muted-foreground plasmo-text-sm">
@@ -142,7 +144,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
             </div>
           </div>
           <div className="plasmo-flex plasmo-items-center plasmo-justify-between">
-            <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground">Priority Fee</Label>
+            <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground">{t("swap.priorityFee")}</Label>
             <Switch checked={priorityFee} onCheckedChange={setPriorityFee} />
           </div>
         </div>
@@ -154,24 +156,24 @@ export default function SwapPage({ onBack }: SwapPageProps) {
           <div className="plasmo-fixed plasmo-inset-0 plasmo-bg-black/50 plasmo-z-40 plasmo-transition-opacity" />
           <div className="plasmo-fixed plasmo-bottom-0 plasmo-left-0 plasmo-right-0 plasmo-bg-background plasmo-rounded-t-2xl plasmo-z-50 plasmo-max-w-md plasmo-mx-auto plasmo-shadow-lg plasmo-animate-in plasmo-slide-in-from-bottom-5">
             <div className="plasmo-p-4 plasmo-border-b plasmo-border-border plasmo-flex plasmo-items-center plasmo-justify-between">
-              <h2 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">Network Notice</h2>
+              <h2 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">{t("swap.networkNotice")}</h2>
             </div>
 
             <div className="plasmo-p-6 plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-text-center">
               <div className="plasmo-w-12 plasmo-h-12 plasmo-bg-primary/10 plasmo-rounded-full plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
-                <img src={infoIcon} className="plasmo-h-6 plasmo-w-6 plasmo-text-primary" alt="Info" />
+                <img src={infoIcon} className="plasmo-h-6 plasmo-w-6 plasmo-text-primary" alt={t("common.settings")} />
               </div>
               <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground plasmo-mb-2">
-                Swapping Not Available
+                {t("swap.swappingNotAvailable")}
               </h3>
               <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">
-                Swapping is not yet available on the Gorbagana network. Please switch to the Solana network to use swap features.
+                {t("swap.swapNetworkNotice")}
               </p>
               <Button
                 onClick={() => onBack()}
                 className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium"
               >
-                Go Back Home
+                {t("common.goBackHome")}
               </Button>
             </div>
           </div>
@@ -184,7 +186,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
           <div className="plasmo-space-y-4">
             <div>
               <div className="plasmo-flex plasmo-justify-between plasmo-mb-2">
-                <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground">From</Label>
+                <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground">{t("swap.from")}</Label>
                 <span className="plasmo-text-xs plasmo-text-muted-foreground">
                   Balance: {getTokenBalance(fromToken)}
                 </span>
@@ -198,7 +200,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
                       onClick={() => handlePercentage(25)} 
                       className="plasmo-text-xs plasmo-h-8 plasmo-flex-1"
                     >
-                      25%
+                      {t("swap.twentyFivePercent")}
                     </Button>
                     <Button 
                       variant="outline" 
@@ -206,7 +208,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
                       onClick={() => handlePercentage(50)} 
                       className="plasmo-text-xs plasmo-h-8 plasmo-flex-1"
                     >
-                      50%
+                      {t("send.fiftyPercent")}
                     </Button>
                     <Button 
                       variant="outline" 
@@ -214,7 +216,7 @@ export default function SwapPage({ onBack }: SwapPageProps) {
                       onClick={() => handlePercentage(100)} 
                       className="plasmo-text-xs plasmo-h-8 plasmo-flex-1"
                     >
-                      MAX
+                      {t("common.max")}
                     </Button>
                   </div>
                   <div className="plasmo-flex plasmo-gap-2">
@@ -255,8 +257,8 @@ export default function SwapPage({ onBack }: SwapPageProps) {
 
             <div>
               <div className="plasmo-flex plasmo-justify-between plasmo-mb-2">
-                <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground">To</Label>
-                <span className="plasmo-text-xs plasmo-text-muted-foreground">Price</span>
+                <Label className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground">{t("swap.to")}</Label>
+                <span className="plasmo-text-xs plasmo-text-muted-foreground">{t("swap.rate")}</span>
               </div>
               <div className="plasmo-flex plasmo-gap-2">
                 <Input
@@ -284,22 +286,22 @@ export default function SwapPage({ onBack }: SwapPageProps) {
 
           <div className="plasmo-bg-card plasmo-rounded-xl plasmo-p-4 plasmo-text-sm plasmo-text-muted-foreground">
             <div className="plasmo-flex plasmo-justify-between plasmo-mb-2">
-              <span>Rate</span>
+              <span>{t("swap.rate")}</span>
               <span>1 {fromToken} = 0.95 {toToken}</span>
             </div>
             <div className="plasmo-flex plasmo-justify-between plasmo-mb-2">
-              <span>Slippage Tolerance</span>
+              <span>{t("swap.slippage")}</span>
               <span>{slippage}%</span>
             </div>
             <div className="plasmo-flex plasmo-justify-between">
-              <span>Network Fee</span>
+              <span>{t("swap.networkFee")}</span>
               <span>0.000005 {fromToken}</span>
             </div>
           </div>
 
           <Button className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium plasmo-text-lg">
             <Maximize2 className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
-            Swap
+            {t("swap.swapButton")}
           </Button>
         </div>
       )}

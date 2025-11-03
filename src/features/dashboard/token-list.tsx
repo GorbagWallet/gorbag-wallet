@@ -4,6 +4,7 @@ import { useWallet } from "~/lib/wallet-context"
 import { TokenCard } from "~/components/token-card"
 import { Button } from "~/components/ui/button"
 import { useState } from "react"
+import { useI18n } from "~/i18n/context"
 import { HideTokenDrawer } from "./hide-token-drawer"
 
 // Import local token icons
@@ -88,6 +89,7 @@ function getTokenIcon(symbol: string, imageUrl?: string): string {
 }
 
 export function TokenList({ loading = false }: TokenListProps) {
+  const { t } = useI18n()
   const { tokens, isTokenHidden } = useWallet()
   const [showHideDrawer, setShowHideDrawer] = useState(false)
 
@@ -97,14 +99,14 @@ export function TokenList({ loading = false }: TokenListProps) {
     <>
       <div className="">
         <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-3">
-          <h2 className="plasmo-text-sm plasmo-font-medium plasmo-text-muted-foreground">Your Tokens</h2>
+          <h2 className="plasmo-text-sm plasmo-font-medium plasmo-text-muted-foreground">{t("wallet.yourTokens")}</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowHideDrawer(true)}
             className="plasmo-h-6 plasmo-px-2 plasmo-rounded-lg plasmo-text-xs hover:plasmo-bg-secondary">
-            <img src={eyeIcon} className="plasmo-h-3.5 plasmo-w-3.5 plasmo-mr-1" alt="Hide" />
-            Hide
+            <img src={eyeIcon} className="plasmo-h-3.5 plasmo-w-3.5 plasmo-mr-1" alt={t("wallet.hideTokens")} />
+            {t("wallet.hideTokens")}
           </Button>
         </div>
         {loading ? (

@@ -59,7 +59,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
         <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-6">
           <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">{t("receive.title")}</h2>
           <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
-            <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt="Close" />
+            <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt={t("common.close")} />
           </Button>
         </div>
 
@@ -70,7 +70,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
                 <div className="plasmo-relative">
                   <img 
                     src={qrCodeDataUrl} 
-                    alt="QR Code" 
+                    alt={t("receive.title")} 
                     className="plasmo-w-48 plasmo-h-48 plasmo-bg-background plasmo-rounded-lg"
                   />
                   {/* Network logo in the center of QR code */}
@@ -102,12 +102,12 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
             className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-flex plasmo-items-center plasmo-justify-center">
             {copied ? (
               <>
-                <img src={successIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Copied" />
+                <img src={successIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt={t("common.copied")} />
                 {t("common.copied")}
               </>
             ) : (
               <>
-                <img src={copyIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Copy" />
+                <img src={copyIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt={t("common.copy")} />
                 {t("receive.copyAddress")}
               </>
             )}

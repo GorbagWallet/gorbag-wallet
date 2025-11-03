@@ -16,7 +16,9 @@ export const es = {
     success: "Éxito",
     failed: "Fallido",
     tryAgain: "Intentar de nuevo",
-    max: "MÁX"
+    max: "MÁX",
+    goBackHome: "Volver a la página principal",
+    welcome: "Bienvenida"
   },
   wallet: {
     title: "Cartera Gorbag",
@@ -33,7 +35,10 @@ export const es = {
     hideTokens: "Ocultar tokens",
     network: "Red",
     networkSolana: "Red Solana",
-    networkGorbagana: "Red Gorbagana"
+    networkGorbagana: "Red Gorbagana",
+    viewDetails: "Ver detalles",
+    addWallet: "+ Añadir cartera",
+    swapTokens: "Intercambiar tokens"
   },
   send: {
     title: "Enviar tokens",
@@ -59,7 +64,9 @@ export const es = {
     simulationSuccess: "Simulación exitosa",
     from: "Enviando {{amount}} {{symbol}} a {{address}}",
     confirming: "Confirmando transacción",
-    pleaseConfirm: "Por favor, confirme en la billetera..."
+    pleaseConfirm: "Por favor, confirme en la billetera...",
+    cancel: "Cancelar",
+    done: "Hecho"
   },
   receive: {
     title: "Recibir tokens",
@@ -145,6 +152,12 @@ export const es = {
     es: "Español"
   },
   onboarding: {
+    createWallet: "Crear nueva cartera",
+    importWallet: "Importar cartera",
+    subtitle: "La cartera Gorbagana",
+    welcomeMessage: "Gorbagio {{nickname}}!",
+    takeTour: "Hacer recorrido",
+    skip: "Saltar",
     importKey: {
       back: "Atrás",
       title: "Ingrese su frase semilla",

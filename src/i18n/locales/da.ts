@@ -16,7 +16,9 @@ export const da = {
     success: "Succes",
     failed: "Mislykkedes",
     tryAgain: "Prøv igen",
-    max: "MAKS"
+    max: "MAKS",
+    goBackHome: "Gå tilbage hjem",
+    welcome: "Velkommen"
   },
   wallet: {
     title: "Gorbag-tegnebog",
@@ -33,7 +35,10 @@ export const da = {
     hideTokens: "Skjul tokens",
     network: "Netværk",
     networkSolana: "Solana-netværk",
-    networkGorbagana: "Gorbagana-netværk"
+    networkGorbagana: "Gorbagana-netværk",
+    viewDetails: "Se detaljer",
+    addWallet: "+ Tilføj tegnebog",
+    swapTokens: "Byt tokens"
   },
   send: {
     title: "Send tokens",
@@ -53,13 +58,15 @@ export const da = {
     transactionFailed: "Transaktion mislykkedes",
     somethingWentWrong: "Noget gik galt",
     signAndConfirm: "Underskriv & bekræft transaktion",
-    simulation: "Simulere transaktion",
+    simulation: "Simulerer transaktion",
     checkingViability: "Tjekker transaktionsmulighed...",
     simulated: "Transaktion simuleret",
     simulationSuccess: "Simulering gennemført",
     from: "Sender {{amount}} {{symbol}} til {{address}}",
     confirming: "Bekræfter transaktion",
-    pleaseConfirm: "Bekræft venligst i tegnebogen..."
+    pleaseConfirm: "Bekræft venligst i tegnebogen...",
+    cancel: "Annuller",
+    done: "Færdig"
   },
   receive: {
     title: "Modtag tokens",
@@ -145,6 +152,12 @@ export const da = {
     es: "Spansk"
   },
   onboarding: {
+    createWallet: "Opret ny tegnebog",
+    importWallet: "Importer tegnebog",
+    subtitle: "Gorbagana-tegnebogen",
+    welcomeMessage: "Gorbagio {{nickname}}!",
+    takeTour: "Tag en omvisning",
+    skip: "Spring over",
     importKey: {
       back: "Tilbage",
       title: "Indtast din seed phrase",

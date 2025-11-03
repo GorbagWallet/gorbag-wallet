@@ -18,7 +18,7 @@ export function ImportWalletFlow({ onBack, onDashboard }: ImportWalletFlowProps)
   const [step, setStep] = useState<ImportStep>("nickname");
   const [nickname, setNickname] = useState("");
   const [importedWallet, setImportedWallet] = useState<ImportedWallet | null>(null);
-  const { addWallet } = useWallet();
+  const { addWallet, setActiveWallet, wallets } = useWallet();
 
   useEffect(() => {
     if (step === "loading" && importedWallet) {
@@ -30,7 +30,7 @@ export function ImportWalletFlow({ onBack, onDashboard }: ImportWalletFlowProps)
         privateKey: bs58.encode(importedWallet.keypair.secretKey),
         createdAt: Date.now(),
       };
-      addWallet(wallet);
+      addWallet(wallet, false); // Don't set as active yet, let user go through post-onboarding
       setStep("postOnboarding");
     }
   }, [step, importedWallet]);
@@ -57,7 +57,17 @@ export function ImportWalletFlow({ onBack, onDashboard }: ImportWalletFlowProps)
       )}
       {step === "loading" && <SetupLoadingStep />}
       {step === "postOnboarding" && (
-        <PostOnboarding onComplete={onDashboard} />
+        <PostOnboarding 
+          nickname={nickname}
+          onComplete={() => {
+            // Set the most recently added wallet as active
+            const lastWallet = wallets[wallets.length - 1];
+            if (lastWallet) {
+              setActiveWallet(lastWallet);
+            }
+            onDashboard();
+          }} 
+        />
       )}
     </div>
   );

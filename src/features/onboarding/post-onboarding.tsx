@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { motion } from "framer-motion";
 import { useWallet } from "~/lib/wallet-context";
+import { useI18n } from "~/i18n/context";
 import { OnboardingTour } from "./onboarding-tour"; // New import
 import welcomeArt from "data-base64:~assets/tour-images/welcome-art.png";
 
 interface PostOnboardingProps {
+  nickname: string;
   onComplete: () => void;
 }
 
-export function PostOnboarding({ onComplete }: PostOnboardingProps) {
+export function PostOnboarding({ nickname, onComplete }: PostOnboardingProps) {
+  const { t } = useI18n();
   const { activeWallet } = useWallet();
   const [isTakeTourAnimating, setTakeTourAnimating] = useState(false);
   const [isSkipAnimating, setSkipAnimating] = useState(false);
@@ -38,7 +41,7 @@ export function PostOnboarding({ onComplete }: PostOnboardingProps) {
   return (
     <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-h-screen plasmo-p-4">
       <div className="plasmo-flex-1 plasmo-w-full plasmo-flex plasmo-rounded-md plasmo-items-center plasmo-justify-center plasmo-mb-3">
-        <img src={welcomeArt} alt="Welcome Art" className="plasmo-w-full plasmo-rounded-md plasmo-h-full plasmo-object-contain" />
+        <img src={welcomeArt} alt={t("common.welcome")} className="plasmo-w-full plasmo-rounded-md plasmo-h-full plasmo-object-contain" />
       </div>
 
       <div className="plasmo-text-center plasmo-mb-3">
@@ -48,7 +51,7 @@ export function PostOnboarding({ onComplete }: PostOnboardingProps) {
           transition={{ duration: 0.5 }}
           className="plasmo-text-3xl plasmo-font-bold plasmo-text-foreground"
         >
-          Gorbagio {activeWallet?.nickname}!
+          {t("onboarding.welcomeMessage", { nickname })}
         </motion.h1>
         {/* <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -67,7 +70,7 @@ export function PostOnboarding({ onComplete }: PostOnboardingProps) {
           className={`plasmo-flex-1 plasmo-h-12 plasmo-text-base ${
             isTakeTourAnimating ? "animate-pop" : ""
           }`}>
-          Take Tour
+          {t("onboarding.takeTour")}
         </Button>
         <Button
           onClick={handleSkipClick}
@@ -76,7 +79,7 @@ export function PostOnboarding({ onComplete }: PostOnboardingProps) {
           className={`plasmo-flex-1 plasmo-h-12 plasmo-text-base plasmo-bg-transparent ${
             isSkipAnimating ? "animate-pop" : ""
           }`}>
-          Skip
+          {t("onboarding.skip")}
         </Button>
       </div>
     </div>

@@ -45,7 +45,7 @@ export function PreferencesSettings() {
               </SelectItem>
             ))}
           </SelectContent>
-        </select>
+        </Select>
       </div>
     </div>
   )

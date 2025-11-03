@@ -74,7 +74,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     if (activeWallet.seedPhrase && activeWallet.seedPhrase.length > 0) {
       // Derive the keypair from the seed phrase when needed
       const { importWallet } = await import("~/lib/utils/wallet-utils");
-      const walletData = await importWallet(activeWallet.seedPhrase.join(" "));
+      const walletData = await importWallet(activeWallet.seedPhrase);
       const keypair = walletData.keypair;
       
       // Sign the transaction with the derived keypair
@@ -324,10 +324,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     setActiveWalletId(wallet ? wallet.id : null);
   };
 
-  const addWallet = (wallet: Wallet) => {
+  const addWallet = (wallet: Wallet, setActive: boolean = true) => {
     setWallets((prevWallets) => {
       const updatedWallets = [...prevWallets, wallet];
-      setActiveWalletId(wallet.id);
+      if (setActive) {
+        setActiveWalletId(wallet.id);
+      }
       return updatedWallets;
     });
   };
