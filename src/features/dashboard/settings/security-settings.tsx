@@ -11,7 +11,7 @@ import { useWallet } from "~/lib/wallet-context"
 
 export function SecuritySettings() {
   const { t } = useI18n()
-  const { setPassword, passwordHash, autoLockTimer, setAutoLockTimer, lockWallet, verifyPassword } = useWallet()
+  const { setPassword, passwordHash, autoLockTimer, setAutoLockTimer, lockWallet, verifyPassword, setLastActiveTime } = useWallet()
   const [password, setPasswordState] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [oldPassword, setOldPassword] = useState("")

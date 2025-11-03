@@ -67,12 +67,18 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     "gorbag_preferred_currency",
     "usd"
   );
-  // Security features
+  // Security features  
   const [passwordHash, setPasswordHash] = useStorage<string | null>("gorbag_password_hash", null);
   const [autoLockTimer, setAutoLockTimer] = useStorage<string>("gorbag_auto_lock_timer", "immediately");
-  const [lastActiveTime, setLastActiveTime] = useState<number | null>(null); // Use useState for immediate updates
+  const [lastActiveTimeStorage, setLastActiveTimeStorage] = useStorage<number | null>("gorbag_last_active_time", null);
+  const [lastActiveTime, setLastActiveTimeState] = useState<number | null>(lastActiveTimeStorage); // Use useState for immediate updates
   const [isLocked, setIsLocked] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false); // Prevent auto-lock during unlock
+  
+  // Sync internal state with storage when storage changes
+  useEffect(() => {
+    setLastActiveTimeState(lastActiveTimeStorage);
+  }, [lastActiveTimeStorage]);
   const [activeWallet, setActiveWalletState] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -299,7 +305,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const lockWallet = () => {
     setIsLocked(true);
     // Set lastActiveTime when locking so we know when it was locked
-    setLastActiveTime(Date.now());
+    const now = Date.now();
+    setLastActiveTimeState(now); // Update immediate state
+    setLastActiveTimeStorage(now); // Update persistent storage
   };
 
   const unlockWallet = async (password: string) => {
@@ -309,7 +317,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const isValid = await verifyPassword(password);
       if (isValid) {
         setIsLocked(false);
-        setLastActiveTime(null); // Now instant with useState
+        setLastActiveTimeState(null); // Update immediate state
+        setLastActiveTimeStorage(null); // Update persistent storage
         return true;
       }
       return false;
@@ -366,7 +375,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       if (document.hidden) {
         // Only set lastActiveTime if we're in an active session (not already set)
         if (lastActiveTime === null && !isLocked && !isUnlocking && passwordHash) {
-          setLastActiveTime(Date.now());
+          const now = Date.now();
+          setLastActiveTimeState(now); // Update immediate state
+          setLastActiveTimeStorage(now); // Update persistent storage
         }
       }
     };
@@ -380,9 +391,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   // Check for auto-lock on mount (when extension reopens)
   useEffect(() => {
-    if (passwordHash && lastActiveTime !== null) {
+    if (passwordHash && lastActiveTimeStorage !== null) {
       const now = Date.now();
-      const timeDiff = now - lastActiveTime;
+      const timeDiff = now - lastActiveTimeStorage;
       
       let lockTime = 0;
       switch (autoLockTimer) {
@@ -585,6 +596,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return activeWallet?.hiddenTokens?.includes(tokenId) || false;
   };
 
+  // Function to set last active time (both state and storage)
+  const setLastActiveTimeCombined = (time: number | null) => {
+    setLastActiveTimeState(time);
+    setLastActiveTimeStorage(time);
+  };
+
   return (
     <WalletContext.Provider
       value={{
@@ -617,7 +634,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         autoLockTimer,
         setAutoLockTimer,
         lastActiveTime,
-        setLastActiveTime
+        setLastActiveTime: setLastActiveTimeCombined
       }}>
       {children}
     </WalletContext.Provider>
