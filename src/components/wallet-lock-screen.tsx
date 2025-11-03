@@ -8,7 +8,7 @@ import lockIcon from "data-base64:~assets/icons/icons8-lock-96.png";
 
 export function WalletLockScreen() {
   const { t } = useI18n();
-  const { unlockWallet, isLocked, activeWallet, setPassword: setContextPassword, setLastActiveTime, setAutoLockTimer } = useWallet();
+  const { unlockWallet, isLocked, activeWallet } = useWallet();
   const [password, setPasswordState] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,21 +32,6 @@ export function WalletLockScreen() {
       setError(t("settings.security.unlockError"));
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleResetPassword = async () => {
-    if (window.confirm("This will clear all password data and reset the wallet security. Continue?")) {
-      try {
-        await setPassword("");
-        setLastActiveTime(null);
-        setAutoLockTimer("immediately"); // Reset to default
-        console.log("Password cleared for debugging");
-        // The wallet should now be unlocked automatically since there's no password
-        // If not, the user can now access settings to set a new password
-      } catch (err) {
-        console.error("Error clearing password:", err);
-      }
     }
   };
 
@@ -115,15 +100,6 @@ export function WalletLockScreen() {
             )}
           </Button>
         </form>
-
-        <div className="plasmo-mt-4">
-          <Button
-            variant="outline"
-            className="plasmo-w-full plasmo-h-10 plasmo-rounded-lg plasmo-text-destructive hover:plasmo-bg-destructive/10"
-            onClick={handleResetPassword}>
-            Reset Password (Debug)
-          </Button>
-        </div>
 
         <div className="plasmo-mt-6 plasmo-text-center plasmo-text-xs plasmo-text-muted-foreground">
           <p>{t("settings.security.passwordNotice")}</p>
