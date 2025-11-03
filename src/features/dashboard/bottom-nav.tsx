@@ -4,7 +4,7 @@ import homeIcon from "data-base64:~assets/icons/icons8-home-24.png"
 import thunderIcon from "data-base64:~assets/icons/icons8-thunder-24.png"
 import galleryIcon from "data-base64:~assets/icons/icons8-gallery-24.png"
 
-export function BottomNav({ onNavigate, view }: { onNavigate: (view: string) => void, view: string }) {
+export function BottomNav({ onNavigate, onRefresh, view }: { onNavigate: (view: string, walletId?: string, shouldRefresh?: boolean) => void, onRefresh?: () => void, view: string }) {
   const { t } = useI18n()
 
   return (
@@ -13,7 +13,10 @@ export function BottomNav({ onNavigate, view }: { onNavigate: (view: string) => 
         <Button
           size="icon"
           className={`plasmo-bg-transparent hover:plasmo-bg-transparent plasmo-rounded-xl plasmo-transition-all plasmo-duration-300 ${view === "dashboard" ? "-plasmo-translate-y-1 plasmo-text-accent" : "plasmo-text-accent/50"}`}
-          onClick={() => onNavigate("dashboard")}
+          onClick={() => {
+            onNavigate("dashboard", undefined, true); // Navigate to dashboard and trigger refresh
+            if (onRefresh) onRefresh(); // Call the refresh function if provided
+          }}
         >
           <img src={homeIcon} className="plasmo-h-5 plasmo-w-5" alt={t("wallet.dashboard")} />
         </Button>

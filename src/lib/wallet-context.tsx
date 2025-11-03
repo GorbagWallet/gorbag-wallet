@@ -38,6 +38,8 @@ interface WalletContextType {
   signTransaction: (transaction: any) => Promise<any>;
   getTransactionHistory: () => Promise<any[]>;
   clearTransactionHistoryCache: () => void;
+  // Function to manually refresh balances
+  refreshBalances: () => Promise<void>;
   // Security functions
   passwordHash: string | null;
   setPassword: (password: string) => Promise<boolean>;
@@ -206,6 +208,45 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const cacheKey = `${activeWallet.address}-${network}`;
       transactionHistoryCache.delete(cacheKey);
       console.log("Cleared transaction history cache for:", cacheKey);
+    }
+  }
+
+  // Function to manually refresh balances
+  async function refreshBalances() {
+    if (!activeWallet) {
+      console.error("No active wallet available for balance refresh");
+      return;
+    }
+
+    setLoading(true);
+    const rpcUrl = networks[network].rpc;
+    
+    try {
+      const balance = await getBalance(activeWallet.address, rpcUrl);
+      setBalance(balance);
+      
+      // Update the native token with the new balance in rawTokens
+      setRawTokens(prevRawTokens => {
+        if (prevRawTokens.length > 0) {
+          const updatedTokens = [...prevRawTokens];
+          const nativeTokenIndex = updatedTokens.findIndex(token => token.id === "So11111111111111111111111111111111111111112");
+          if (nativeTokenIndex !== -1) {
+            updatedTokens[nativeTokenIndex] = {
+              ...updatedTokens[nativeTokenIndex],
+              token_info: {
+                ...updatedTokens[nativeTokenIndex].token_info,
+                balance: balance * LAMPORTS_PER_SOL,
+              }
+            };
+            return updatedTokens;
+          }
+        }
+        return prevRawTokens;
+      });
+    } catch (error) {
+      console.error("Error refreshing balances:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -624,6 +665,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         signTransaction: isLocked ? async () => { throw new Error("Wallet is locked"); } : signTransaction,
         getTransactionHistory: isLocked ? async () => [] : getTransactionHistory,
         clearTransactionHistoryCache,
+        refreshBalances,
         // Security functions
         passwordHash,
         setPassword,

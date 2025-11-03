@@ -16,12 +16,12 @@ import { WalletManagementPage } from "~/features/wallet-management/wallet-manage
 import ActivityPage from "~/features/dashboard/activity-page"
 import SettingsPage from "~/features/dashboard/settings/settings-page"
 import SwapPage from "~/features/swap/swap-page"
-import NftPage from "~/features/nft/nft-page"
+import NftPage from "~/features/dashboard/nft-page"
 import { WalletLockScreen } from "~/components/wallet-lock-screen"
 
 import "~style.css"
 
-function DashboardPage({ onNavigate, view }: { onNavigate: (view: string, walletId?: string) => void, view: string }) {
+function DashboardPage({ onNavigate, onRefresh, view }: { onNavigate: (view: string, walletId?: string) => void, onRefresh?: () => void, view: string }) {
   const { activeWallet, loading } = useWallet()
   const [activeModal, setActiveModal] = useState<"send" | "receive" | "swap" | null>(null)
   const [balanceHidden, setBalanceHidden] = useState(false)
@@ -36,7 +36,7 @@ function DashboardPage({ onNavigate, view }: { onNavigate: (view: string, wallet
           <TokenList loading={loading} />
         </div>
       </div>
-      <BottomNav onNavigate={onNavigate} view={view} />
+      <BottomNav onNavigate={onNavigate} onRefresh={onRefresh} view={view} />
 
       <SendModal open={activeModal === "send"} onClose={() => setActiveModal(null)} />
       <ReceiveModal open={activeModal === "receive"} onClose={() => setActiveModal(null)} />
@@ -46,15 +46,18 @@ function DashboardPage({ onNavigate, view }: { onNavigate: (view: string, wallet
 }
 
 const App = () => {
-  const { activeWallet, loading } = useWallet()
+  const { activeWallet, loading, refreshBalances } = useWallet()
   const [view, setView] = useState<
     "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings" | "swap" | "nft"
   >("loading")
   const [selectedWalletId, setSelectedWalletId] = useState<string | undefined>(undefined)
 
-  const handleNavigate = (newView: string, walletId?: string) => {
+  const handleNavigate = (newView: string, walletId?: string, shouldRefresh?: boolean) => {
     setSelectedWalletId(walletId)
     setView(newView as "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings")
+    if (shouldRefresh && newView === "dashboard") {
+      refreshBalances();
+    }
   }
 
   useEffect(() => {
@@ -74,7 +77,7 @@ const App = () => {
       case "onboarding":
         return <Onboarding onDashboard={() => handleNavigate("dashboard") } />;
       case "dashboard":
-        return <DashboardPage onNavigate={handleNavigate} view={view} />;
+        return <DashboardPage onNavigate={handleNavigate} onRefresh={refreshBalances} view={view} />;
       case "walletManagement":
         return <WalletManagementPage walletId={selectedWalletId} onBack={() => handleNavigate("dashboard") } />;
       case "activity":
