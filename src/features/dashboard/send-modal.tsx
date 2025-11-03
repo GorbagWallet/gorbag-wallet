@@ -17,6 +17,7 @@ import closeIcon from "data-base64:~assets/icons/icons8-close-24.png"
 import continueIcon from "data-base64:~assets/icons/icons8-telegram-app-24.png"
 import validIcon from "data-base64:~assets/icons/icons8-success-24.png"  // Using success icon for valid status
 import invalidIcon from "data-base64:~assets/icons/icons8-cancel-24.png" // Using cancel icon for invalid status
+import gorbagLogo from "data-base64:~assets/icons/Gorbag Logo Transparent.gif"
 
 interface SendModalProps {
   open: boolean
@@ -332,7 +333,12 @@ export function SendModal({ open, onClose }: SendModalProps) {
 
         {step === "simulation" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
-            <Loader2 className="plasmo-h-12 plasmo-w-12 plasmo-animate-spin plasmo-text-primary plasmo-mb-4" />
+            <img 
+              src={gorbagLogo} 
+              className="plasmo-w-12 plasmo-h-12 plasmo-mb-4 plasmo-animate-spin" 
+              style={{ animation: 'spin 1.5s linear infinite' }}
+              alt={t("send.simulation")} 
+            />
             <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.simulation")}</h3>
             <p className="plasmo-text-sm plasmo-text-muted-foreground">{t("send.checkingViability")}</p>
           </div>
@@ -365,7 +371,11 @@ export function SendModal({ open, onClose }: SendModalProps) {
 
         {step === "sending" && (
           <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-12">
-            <Loader2 className="plasmo-h-12 plasmo-w-12 plasmo-animate-spin plasmo-text-primary plasmo-mb-4" />
+            <img 
+              src={gorbagLogo} 
+              className="plasmo-w-12 plasmo-h-12 plasmo-mb-4 plasmo-animate-spin" 
+              alt={t("send.confirming")} 
+            />
             <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.confirming")}</h3>
             <p className="plasmo-text-sm plasmo-text-muted-foreground">{t("send.pleaseConfirm")}</p>
           </div>
