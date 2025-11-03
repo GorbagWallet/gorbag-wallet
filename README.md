@@ -1,6 +1,6 @@
 # Gorbag Wallet
 
-![Gorbag Wallet Banner](/src/assets/Gorbag Wallet Banner.png)
+<img src="src/assets/Gorbag-Wallet-Banner.png" />
 
 Gorbag Wallet is an open-source cryptocurrency wallet extension that provides secure access to the Gorbagana network and other blockchain ecosystems. Built with TypeScript and React, it offers users a seamless way to manage their digital assets.
 
