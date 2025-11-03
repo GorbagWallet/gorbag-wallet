@@ -17,6 +17,7 @@ import ActivityPage from "~/features/dashboard/activity-page"
 import SettingsPage from "~/features/dashboard/settings/settings-page"
 import SwapPage from "~/features/swap/swap-page"
 import NftPage from "~/features/nft/nft-page"
+import { WalletLockScreen } from "~/components/wallet-lock-screen"
 
 import "~style.css"
 
@@ -71,25 +72,30 @@ const App = () => {
       case "loading":
         return <DashboardPage onNavigate={handleNavigate} view={view} />;
       case "onboarding":
-        return <Onboarding onDashboard={() => handleNavigate("dashboard")} />
+        return <Onboarding onDashboard={() => handleNavigate("dashboard") } />;
       case "dashboard":
-        return <DashboardPage onNavigate={handleNavigate} view={view} />
+        return <DashboardPage onNavigate={handleNavigate} view={view} />;
       case "walletManagement":
-        return <WalletManagementPage walletId={selectedWalletId} onBack={() => handleNavigate("dashboard")} />
+        return <WalletManagementPage walletId={selectedWalletId} onBack={() => handleNavigate("dashboard") } />;
       case "activity":
-        return <ActivityPage onBack={() => handleNavigate("dashboard")} />
+        return <ActivityPage onBack={() => handleNavigate("dashboard") } />;
       case "settings":
-        return <SettingsPage onBack={() => handleNavigate("dashboard")} />
+        return <SettingsPage onBack={() => handleNavigate("dashboard") } />;
       case "swap":
-        return <SwapPage onBack={() => handleNavigate("dashboard")} />
+        return <SwapPage onBack={() => handleNavigate("dashboard") } />;
       case "nft":
-        return <NftPage onBack={() => handleNavigate("dashboard")} />
+        return <NftPage onBack={() => handleNavigate("dashboard") } />;
       default:
-        return <div>Loading...</div>
+        return <div>Loading...</div>;
     }
-  }
+  };
 
-  return <div className="plasmo-w-[400px] plasmo-h-screen plasmo-bg-background plasmo-fixed">{renderView()}</div>
+  return (
+    <div className="plasmo-w-[400px] plasmo-h-screen plasmo-bg-background plasmo-fixed">
+      <WalletLockScreen />
+      {renderView()}
+    </div>
+  );
 }
 
 const IndexPopup = () => {

@@ -38,6 +38,17 @@ interface WalletContextType {
   signTransaction: (transaction: any) => Promise<any>;
   getTransactionHistory: () => Promise<any[]>;
   clearTransactionHistoryCache: () => void;
+  // Security functions
+  passwordHash: string | null;
+  setPassword: (password: string) => Promise<boolean>;
+  verifyPassword: (password: string) => Promise<boolean>;
+  lockWallet: () => void;
+  unlockWallet: (password: string) => Promise<boolean>;
+  isLocked: boolean;
+  autoLockTimer: string;
+  setAutoLockTimer: (timer: string) => void;
+  lastActiveTime: number | null;  // Now using useState instead of storage
+  setLastActiveTime: (time: number | null) => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -56,6 +67,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     "gorbag_preferred_currency",
     "usd"
   );
+  // Security features
+  const [passwordHash, setPasswordHash] = useStorage<string | null>("gorbag_password_hash", null);
+  const [autoLockTimer, setAutoLockTimer] = useStorage<string>("gorbag_auto_lock_timer", "immediately");
+  const [lastActiveTime, setLastActiveTime] = useState<number | null>(null); // Use useState for immediate updates
+  const [isLocked, setIsLocked] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false); // Prevent auto-lock during unlock
   const [activeWallet, setActiveWalletState] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -185,6 +202,211 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       console.log("Cleared transaction history cache for:", cacheKey);
     }
   }
+
+  // Security functions
+  const setPassword = async (password: string) => {
+    if (!password) {
+      setPasswordHash(null);
+      return true;
+    }
+    
+    try {
+      // Generate salt
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      
+      // Hash password with salt using PBKDF2
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        data,
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits"]
+      );
+      
+      const derivedBits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        256
+      );
+      
+      const hashArray = new Uint8Array(derivedBits);
+      const combined = new Uint8Array(salt.length + hashArray.length);
+      combined.set(salt);
+      combined.set(hashArray, salt.length);
+      
+      const hashString = Array.from(combined)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      setPasswordHash(hashString);
+      return true;
+    } catch (error) {
+      console.error("Error setting password:", error);
+      return false;
+    }
+  };
+
+  const verifyPassword = async (password: string) => {
+    if (!passwordHash) return true; // No password set
+    
+    try {
+      const encoder = new TextEncoder();
+      const hashBytes = new Uint8Array(passwordHash.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      const salt = hashBytes.slice(0, 16);
+      const storedHash = hashBytes.slice(16);
+      
+      const data = encoder.encode(password);
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        data,
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits"]
+      );
+      
+      const derivedBits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        256
+      );
+      
+      const hashArray = new Uint8Array(derivedBits);
+      
+      // Compare hashes
+      for (let i = 0; i < hashArray.length; i++) {
+        if (hashArray[i] !== storedHash[i]) return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error verifying password:", error);
+      return false;
+    }
+  };
+
+  const lockWallet = () => {
+    setIsLocked(true);
+    // Set lastActiveTime when locking so we know when it was locked
+    setLastActiveTime(Date.now());
+  };
+
+  const unlockWallet = async (password: string) => {
+    setIsUnlocking(true); // Prevent auto-lock interference during unlock
+    
+    try {
+      const isValid = await verifyPassword(password);
+      if (isValid) {
+        setIsLocked(false);
+        setLastActiveTime(null); // Now instant with useState
+        return true;
+      }
+      return false;
+    } finally {
+      setIsUnlocking(false); // Always clear the flag
+    }
+  };
+
+  const checkAutoLock = () => {
+    if (!passwordHash) return; // No password set
+    if (isLocked) return; // Already locked
+    if (isUnlocking) return; // Don't auto-lock during unlock
+    
+    const now = Date.now();
+    const lastActive = lastActiveTime;
+    
+    // If lastActiveTime is null, user is actively using the wallet (just unlocked)
+    if (lastActive === null) {
+      return;
+    }
+    
+    const timeDiff = now - lastActive;
+    let lockTime = 0;
+    
+    switch (autoLockTimer) {
+      case "immediately": 
+        // Small grace period to allow popup close to be detected
+        lockTime = 1000; // 1 second
+        break;
+      case "10mins": 
+        lockTime = 10 * 60 * 1000; 
+        break;
+      case "30mins": 
+        lockTime = 30 * 60 * 1000; 
+        break;
+      case "1hr": 
+        lockTime = 60 * 60 * 1000; 
+        break;
+      case "4hrs": 
+        lockTime = 4 * 60 * 60 * 1000; 
+        break;
+      default: 
+        lockTime = 1000;
+    }
+    
+    if (timeDiff >= lockTime) {
+      lockWallet();
+    }
+  };
+
+  // Track popup visibility to detect when user closes the extension
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Only set lastActiveTime if we're in an active session (not already set)
+        if (lastActiveTime === null && !isLocked && !isUnlocking && passwordHash) {
+          setLastActiveTime(Date.now());
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [lastActiveTime, isLocked, isUnlocking, passwordHash]);
+
+  // Check for auto-lock on mount (when extension reopens)
+  useEffect(() => {
+    if (passwordHash && lastActiveTime !== null) {
+      const now = Date.now();
+      const timeDiff = now - lastActiveTime;
+      
+      let lockTime = 0;
+      switch (autoLockTimer) {
+        case "immediately": lockTime = 1000; break;
+        case "10mins": lockTime = 10 * 60 * 1000; break;
+        case "30mins": lockTime = 30 * 60 * 1000; break;
+        case "1hr": lockTime = 60 * 60 * 1000; break;
+        case "4hrs": lockTime = 4 * 60 * 60 * 1000; break;
+        default: lockTime = 1000;
+      }
+      
+      if (timeDiff >= lockTime) {
+        setIsLocked(true);
+      }
+    }
+  }, []); // Only run on initial mount
+
+  // Periodic auto-lock checking
+  useEffect(() => {
+    checkAutoLock();
+    
+    const interval = setInterval(checkAutoLock, 5000); // Check every 5 seconds
+    return () => clearInterval(interval);
+  }, [passwordHash, autoLockTimer, isLocked, isUnlocking]); // Removed lastActiveTime to prevent re-triggering
 
   useEffect(() => {
     setLoading(true);
@@ -377,14 +599,25 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         deleteWallet,
         toggleHiddenToken,
         isTokenHidden,
-        balance,
-        portfolioValue,
-        tokens,
+        balance: isLocked ? 0 : balance,
+        portfolioValue: isLocked ? 0 : portfolioValue,
+        tokens: isLocked ? [] : tokens,
         preferredCurrency,
         setPreferredCurrency,
-        signTransaction,
-        getTransactionHistory,
+        signTransaction: isLocked ? async () => { throw new Error("Wallet is locked"); } : signTransaction,
+        getTransactionHistory: isLocked ? async () => [] : getTransactionHistory,
         clearTransactionHistoryCache,
+        // Security functions
+        passwordHash,
+        setPassword,
+        verifyPassword,
+        lockWallet,
+        unlockWallet,
+        isLocked,
+        autoLockTimer,
+        setAutoLockTimer,
+        lastActiveTime,
+        setLastActiveTime
       }}>
       {children}
     </WalletContext.Provider>
