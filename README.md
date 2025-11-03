@@ -91,4 +91,4 @@ Please note that this is experimental software. Always backup your seed phrase a
 
 ---
 
-**Author**: David Nzube (Skipp)
+**Author**: David Nzube (Skipp) | [X(Twitter)](https://x.com/davidnzubee) | [GitHub](https://github.com/DavidNzube101)
