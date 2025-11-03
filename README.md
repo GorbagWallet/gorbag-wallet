@@ -1,6 +1,6 @@
 # Gorbag Wallet
 
-<img src="src/assets/Gorbag-Wallet-Banner.png" />
+![Gorbag Wallet Banner](src/assets/Gorbag-Wallet-Banner.png)
 
 Gorbag Wallet is an open-source cryptocurrency wallet extension that provides secure access to the Gorbagana network and other blockchain ecosystems. Built with TypeScript and React, it offers users a seamless way to manage their digital assets.
 
@@ -28,24 +28,38 @@ The network's native token is GOR, which powers transactions and enables governa
 
 ## About Gorbag Wallet
 
-Gorbag Wallet is a browser extension that provides secure access to the Gorbagana network and other compatible blockchains. Key features include:
+Gorbag Wallet is a browser extension that provides secure access to the Gorbagana network and other compatible blockchains. Built with security and usability in mind, it offers a comprehensive suite of features for managing your digital assets.
 
-- **Multi-network support**: Works with both Gorbagana and Solana networks
-- **Secure storage**: Advanced encryption for private keys
-- **Token management**: View and manage multiple tokens
-- **Transaction capabilities**: Send, receive, and swap assets
-- **User-friendly interface**: Intuitive design for both beginners and advanced users
-- **Security features**: Password protection with configurable auto-lock timers
+## 🚀 Key Features
 
-### Features
-
-- Wallet creation and import functionality
-- Multi-token support with real-time price tracking
+### 🔐 **Security First**
+- Advanced encryption for private keys
+- Password protection with configurable auto-lock timers
 - Secure transaction signing
-- Network switching between Gorbagana and Solana
-- Portfolio value tracking
+- Seed phrase backup and recovery
+
+### 🌐 **Multi-Network Support**
+- Native support for Gorbagana and Solana networks
+- Seamless network switching
+- Cross-chain compatibility
+
+### 💰 **Token Management**
+- Multi-token support with real-time price tracking
+- Portfolio value tracking across networks
 - Token hiding functionality
+- Detailed token information and analytics
+
+### 🔄 **Transaction Capabilities**
+- Send and receive multiple token types
 - Swap capabilities through integrated DEX
+- Transaction history tracking
+- Real-time balance updates
+
+### 🎨 **User Experience**
+- Intuitive interface for both beginners and advanced users
+- Responsive design optimized for all screen sizes
+- Smooth animations and transitions
+- Multi-language support
 
 ### Technical Stack
 
@@ -91,4 +105,5 @@ Please note that this is experimental software. Always backup your seed phrase a
 
 ---
 
-**Author**: David Nzube (Skipp) | [X(Twitter)](https://x.com/davidnzubee) | [GitHub](https://github.com/DavidNzube101)
+**Author**: David Nzube (Skipp)  
+[![Twitter](https://img.shields.io/badge/Twitter-@davidnzubee-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/davidnzubee) [![GitHub](https://img.shields.io/badge/GitHub-DavidNzube101-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/DavidNzube101)
