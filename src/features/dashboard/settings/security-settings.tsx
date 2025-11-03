@@ -11,7 +11,7 @@ import { useWallet } from "~/lib/wallet-context"
 
 export function SecuritySettings() {
   const { t } = useI18n()
-  const { setPassword, passwordHash, autoLockTimer, setAutoLockTimer, lockWallet, verifyPassword, setLastActiveTime } = useWallet()
+  const { setPassword, passwordHash, autoLockTimer, setAutoLockTimer, lockWallet, verifyPassword } = useWallet()
   const [password, setPasswordState] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [oldPassword, setOldPassword] = useState("")
@@ -19,9 +19,9 @@ export function SecuritySettings() {
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [isChangingPassword, setIsChangingPassword] = useState(false) // Step 1: verify old password
   const [hasVerifiedOldPassword, setHasVerifiedOldPassword] = useState(false) // Step 2: show new password fields
+  const [passwordStatus, setPasswordStatus] = useState<'unknown' | 'set' | 'not_set'>('unknown')
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [passwordStatus, setPasswordStatus] = useState<'unknown' | 'set' | 'not_set'>('unknown')
 
   // Update local state when context values change - this reflects global password status
   useEffect(() => {
@@ -132,19 +132,6 @@ export function SecuritySettings() {
   }
 
   const isPasswordSet = passwordStatus === 'set'
-
-  const clearPasswordForDebug = async () => {
-    if (window.confirm("This is a debug function. Clear all password data?")) {
-      try {
-        await setPassword("");
-        setLastActiveTime(null);
-        setAutoLockTimer("immediately"); // Reset to default
-        console.log("Password cleared for debugging");
-      } catch (err) {
-        console.error("Error clearing password:", err);
-      }
-    }
-  };
 
   return (
     <div className="plasmo-space-y-6">
@@ -286,16 +273,6 @@ export function SecuritySettings() {
             <SelectItem value="4hrs">{t("settings.security.hours", { count: 4 })}</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-
-      {/* Hidden debug button - only visible with special key combination */}
-      <div className="plasmo-hidden" id="debug-controls">
-        <Button
-          variant="outline"
-          className="plasmo-w-full plasmo-text-destructive plasmo-h-8 plasmo-text-xs"
-          onClick={clearPasswordForDebug}>
-          Clear Password (Debug)
-        </Button>
       </div>
     </div>
   )
