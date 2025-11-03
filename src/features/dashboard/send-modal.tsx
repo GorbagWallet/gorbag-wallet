@@ -169,7 +169,6 @@ export function SendModal({ open, onClose }: SendModalProps) {
       setStep("failed")
     }
   }
-  }
 
   const handleSignAndConfirm = async () => {
     setStep("sending")

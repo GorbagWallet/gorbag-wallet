@@ -35,3 +35,4 @@ dist/
 # misc
 current_stage.txt
 final-test.js
+/docs
