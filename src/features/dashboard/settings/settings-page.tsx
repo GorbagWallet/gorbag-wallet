@@ -6,11 +6,20 @@ import { useState } from "react"
 import { PreferencesSettings } from "./preferences-settings"
 import { SecuritySettings } from "./security-settings"
 import { NetworkSettings } from "./network-settings"
+import { useI18n } from "~/i18n/context"
 
 type SettingsView = "main" | "preferences" | "security" | "networks"
 
 export default function SettingsPage({ onBack }: { onBack: () => void }) {
+  const { t } = useI18n()
   const [view, setView] = useState<SettingsView>("main")
+
+  const titles: Record<SettingsView, string> = {
+    main: t("settings.title"),
+    preferences: t("settings.preferences"),
+    security: t("settings.security.title"),
+    networks: t("settings.activeNetworks")
+  }
 
   return (
     <div className="plasmo-min-h-screen plasmo-bg-background plasmo-pb-24">
@@ -19,15 +28,11 @@ export default function SettingsPage({ onBack }: { onBack: () => void }) {
           variant="ghost"
           size="icon"
           onClick={() => (view === "main" ? onBack() : setView("main"))}
-          className="plasmo-rounded-xl"
-        >
+          className="plasmo-rounded-xl">
           <ChevronLeft className="plasmo-h-5 plasmo-w-5" />
         </Button>
         <h1 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">
-          {view === "main" && "Settings"}
-          {view === "preferences" && "Preferences"}
-          {view === "security" && "Security"}
-          {view === "networks" && "Active Networks"}
+          {titles[view]}
         </h1>
         <div className="plasmo-w-10" />
       </header>
@@ -37,23 +42,20 @@ export default function SettingsPage({ onBack }: { onBack: () => void }) {
           <div className="plasmo-space-y-2">
             <button
               onClick={() => setView("preferences")}
-              className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-card plasmo-rounded-xl hover:plasmo-bg-card/80 plasmo-transition-colors"
-            >
-              <span className="plasmo-font-medium plasmo-text-foreground">Preferences</span>
+              className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-card plasmo-rounded-xl hover:plasmo-bg-card/80 plasmo-transition-colors">
+              <span className="plasmo-font-medium plasmo-text-foreground">{t("settings.preferences")}</span>
               <ChevronRight className="plasmo-h-5 plasmo-w-5 plasmo-text-muted-foreground" />
             </button>
             <button
               onClick={() => setView("security")}
-              className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-card plasmo-rounded-xl hover:plasmo-bg-card/80 plasmo-transition-colors"
-            >
-              <span className="plasmo-font-medium plasmo-text-foreground">Security</span>
+              className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-card plasmo-rounded-xl hover:plasmo-bg-card/80 plasmo-transition-colors">
+              <span className="plasmo-font-medium plasmo-text-foreground">{t("settings.security.title")}</span>
               <ChevronRight className="plasmo-h-5 plasmo-w-5 plasmo-text-muted-foreground" />
             </button>
             <button
               onClick={() => setView("networks")}
-              className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-card plasmo-rounded-xl hover:plasmo-bg-card/80 plasmo-transition-colors"
-            >
-              <span className="plasmo-font-medium plasmo-text-foreground">Active Networks</span>
+              className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-card plasmo-rounded-xl hover:plasmo-bg-card/80 plasmo-transition-colors">
+              <span className="plasmo-font-medium plasmo-text-foreground">{t("settings.activeNetworks")}</span>
               <ChevronRight className="plasmo-h-5 plasmo-w-5 plasmo-text-muted-foreground" />
             </button>
           </div>

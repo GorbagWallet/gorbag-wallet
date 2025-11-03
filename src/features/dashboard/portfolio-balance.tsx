@@ -3,6 +3,7 @@
 import { currencySymbols } from "~/lib/currency";
 import { TrendingUp } from "lucide-react"
 import { useWallet } from "~/lib/wallet-context"
+import { useI18n } from "~/i18n/context"
 
 interface PortfolioBalanceProps {
   hidden?: boolean;
@@ -10,6 +11,7 @@ interface PortfolioBalanceProps {
 }
 
 export function PortfolioBalance({ hidden = false, loading = false }: PortfolioBalanceProps) {
+  const { t } = useI18n()
   const { portfolioValue, preferredCurrency } = useWallet();
 
   const formattedBalance = (portfolioValue).toFixed(2);
@@ -27,13 +29,13 @@ export function PortfolioBalance({ hidden = false, loading = false }: PortfolioB
 
   return (
     <div className="plasmo-text-center plasmo-pb-6">
-      <p className="plasmo-text-muted-foreground plasmo-text-sm plasmo-mb-2">Total Balance</p>
+      <p className="plasmo-text-muted-foreground plasmo-text-sm plasmo-mb-2">{t("wallet.totalBalance")}</p>
       <h1 className="plasmo-text-5xl plasmo-font-bold plasmo-text-foreground plasmo-mb-3 plasmo-text-balance plasmo-font-sans">
         {hidden ? "****" : `${currencySymbol}${formattedBalance}`}
       </h1>
       <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-text-primary">
         <TrendingUp className="plasmo-h-4 plasmo-w-4" />
-        <span className="plasmo-text-sm plasmo-font-medium">{hidden ? "****" : "+2.34% Today"}</span>
+        <span className="plasmo-text-sm plasmo-font-medium">{hidden ? "****" : t("wallet.todayChange", { change: "2.34" })}</span>
       </div>
     </div>
   );

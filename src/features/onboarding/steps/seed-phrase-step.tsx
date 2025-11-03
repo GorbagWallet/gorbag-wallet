@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { ChevronLeft, Copy, Download, Check, Eye, EyeOff } from "lucide-react";
 import { generateSeedPhrase } from "~/lib/utils/wallet-utils";
+import { useI18n } from "~/i18n/context";
 
 interface SeedPhraseStepProps {
   onSeedGenerated: (phrase: string[]) => void;
@@ -10,6 +11,7 @@ interface SeedPhraseStepProps {
 }
 
 export function SeedPhraseStep({ onSeedGenerated, onBack }: SeedPhraseStepProps) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const [phrase, setPhrase] = useState<string[]>([]);
   const [isHidden, setIsHidden] = useState(true);
@@ -41,13 +43,13 @@ export function SeedPhraseStep({ onSeedGenerated, onBack }: SeedPhraseStepProps)
     <div className="plasmo-w-full">
       <button onClick={onBack} className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-text-muted-foreground hover:plasmo-text-foreground plasmo-mb-6">
         <ChevronLeft className="plasmo-h-4 plasmo-w-4" />
-        Back
+        {t("onboarding.seedPhrase.back")}
       </button>
 
       <div className="plasmo-mb-8">
-        <h2 className="plasmo-text-2xl plasmo-font-bold plasmo-text-foreground plasmo-mb-2">Your Seed Phrase</h2>
+        <h2 className="plasmo-text-2xl plasmo-font-bold plasmo-text-foreground plasmo-mb-2">{t("onboarding.seedPhrase.title")}</h2>
         <p className="plasmo-text-muted-foreground plasmo-text-sm">
-          Save this phrase in a safe place. Never share it with anyone. You'll need it to recover your wallet.
+          {t("onboarding.seedPhrase.description")}
         </p>
       </div>
 
@@ -62,7 +64,7 @@ export function SeedPhraseStep({ onSeedGenerated, onBack }: SeedPhraseStepProps)
         <Card className="plasmo-p-6 plasmo-mb-6 plasmo-bg-card/50 plasmo-border-primary/20">
           {isHidden && (
             <div className="plasmo-absolute plasmo-inset-0 plasmo-bg-card/80 plasmo-backdrop-blur-sm plasmo-flex plasmo-items-center plasmo-justify-center plasmo-rounded-lg">
-              <p className="plasmo-text-muted-foreground">Click to reveal</p>
+              <p className="plasmo-text-muted-foreground">{t("onboarding.seedPhrase.reveal")}</p>
             </div>
           )}
           <div className={`plasmo-grid plasmo-grid-cols-3 plasmo-gap-3 ${ 
@@ -83,23 +85,23 @@ export function SeedPhraseStep({ onSeedGenerated, onBack }: SeedPhraseStepProps)
           {copied ? (
             <>
               <Check className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
-              Copied
+              {t("onboarding.seedPhrase.copied")}
             </>
           ) : (
             <>
               <Copy className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
-              Copy Phrase
+              {t("onboarding.seedPhrase.copyPhrase")}
             </>
           )}
         </Button>
         <Button onClick={downloadSeedPhrase} variant="outline" size="lg" className="plasmo-flex-1 plasmo-h-12 plasmo-bg-transparent">
           <Download className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" />
-          Download as File
+          {t("onboarding.seedPhrase.download")}
         </Button>
       </div>
 
       <Button onClick={() => onSeedGenerated(phrase)} size="lg" className="plasmo-w-full plasmo-h-12">
-        I've Saved My Phrase
+        {t("onboarding.seedPhrase.saved")}
       </Button>
     </div>
   );

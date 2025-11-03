@@ -1,0 +1,200 @@
+export const en = {
+  common: {
+    send: "Send",
+    receive: "Receive",
+    swap: "Swap",
+    back: "Back",
+    close: "Close",
+    done: "Done",
+    continue: "Continue",
+    cancel: "Cancel",
+    copy: "Copy",
+    copied: "Copied!",
+    settings: "Settings",
+    loading: "Loading...",
+    error: "Error",
+    success: "Success",
+    failed: "Failed",
+    tryAgain: "Try Again",
+    max: "MAX"
+  },
+  wallet: {
+    title: "Gorbag Wallet",
+    dashboard: "Dashboard",
+    activity: "Activity",
+    tokens: "Tokens",
+    manageTokens: "Manage Tokens",
+    yourTokens: "Your Tokens",
+    portfolioValue: "Portfolio Value",
+    totalBalance: "Total Balance",
+    todayChange: "+{{change}}% Today",
+    sendTokens: "Send Tokens",
+    receiveTokens: "Receive Tokens",
+    hideTokens: "Hide Tokens",
+    network: "Network",
+    networkSolana: "Solana Network",
+    networkGorbagana: "Gorbagana Network"
+  },
+  send: {
+    title: "Send Tokens",
+    recipientAddress: "Recipient Address",
+    enterAddress: "Enter wallet address",
+    amount: "Amount",
+    networkFee: "Network Fee",
+    total: "Total",
+    twentyPercent: "20%",
+    fiftyPercent: "50%",
+    balance: "Available: {{balance}} {{symbol}}",
+    invalidAddress: "Invalid recipient address",
+    insufficientBalance: "Insufficient balance",
+    insufficientFees: "Insufficient {{symbol}} for transaction fees. Minimum {{min}} {{symbol}} required.",
+    transactionConfirmed: "Transaction Confirmed!",
+    tokensSent: "Your tokens have been sent",
+    transactionFailed: "Transaction Failed",
+    somethingWentWrong: "Something went wrong",
+    signAndConfirm: "Sign & Confirm Transaction",
+    simulation: "Simulating Transaction",
+    checkingViability: "Checking transaction viability...",
+    simulated: "Transaction Simulated",
+    simulationSuccess: "Simulation successful",
+    from: "Sending {{amount}} {{symbol}} to {{address}}",
+    confirming: "Confirming Transaction",
+    pleaseConfirm: "Please confirm in wallet..."
+  },
+  receive: {
+    title: "Receive Tokens",
+    generatingQR: "Generating QR...",
+    yourAddress: "Your Address",
+    copyAddress: "Copy Address"
+  },
+  swap: {
+    title: "Swap Tokens",
+    from: "From",
+    to: "To",
+    slippage: "Slippage Tolerance",
+    priorityFee: "Priority Fee",
+    rate: "Rate",
+    networkFee: "Network Fee",
+    twentyFivePercent: "25%",
+    slippageTolerance: "Slippage Tolerance: {{slippage}}%",
+    swappingNotAvailable: "Swapping Not Available",
+    networkNotice: "Network Notice",
+    swapNetworkNotice: "Swapping is not yet available on the Gorbagana network. Please switch to the Solana network to use swap features.",
+    swapButton: "Swap"
+  },
+  activity: {
+    title: "Recent Activity",
+    loading: "Loading transaction history...",
+    error: "Failed to load transaction history. Please try again.",
+    all: "All",
+    sent: "Sent",
+    received: "Received",
+    noHistory: "No transaction history found",
+    unknown: "Unknown",
+    amount: "{{sign}}{{amount}}",
+    transactionHash: "Transaction Hash"
+  },
+  settings: {
+    title: "Settings",
+    preferences: "Preferences",
+    activeNetworks: "Active Networks",
+    general: "General",
+    language: "Language",
+    security: "Security",
+    about: "About",
+    version: "Version",
+    theme: "Theme",
+    currency: "Currency",
+    currencies: {
+      usd: "USD - United States Dollar",
+      gbp: "GBP - British Pound",
+      ngn: "NGN - Nigerian Naira",
+      eur: "EUR - Euro",
+      jpy: "JPY - Japanese Yen"
+    },
+    security: {
+      title: "Security",
+      walletPassword: "Wallet Password",
+      passwordSet: "Set",
+      changePassword: "Change Password",
+      setPassword: "Set Password",
+      enterPassword: "Enter password",
+      confirmPassword: "Confirm password",
+      passwordsDoNotMatch: "Passwords do not match",
+      passwordTooShort: "Password must be at least 6 characters",
+      cancel: "Cancel",
+      save: "Save",
+      autoLockTimer: "Auto-Lock Timer",
+      immediately: "Immediately",
+      minutes: "{{count}} Minutes",
+      hour: "{{count}} Hour",
+      hours: "{{count}} Hours"
+    }
+  },
+  errors: {
+    invalidAddress: "Invalid wallet address",
+    insufficientFunds: "Insufficient funds",
+    transactionFailed: "Transaction failed",
+    networkError: "Network error",
+    unknownError: "An unknown error occurred"
+  },
+  languages: {
+    en: "English",
+    da: "Danish",
+    fr: "French",
+    es: "Spanish"
+  },
+  onboarding: {
+    importKey: {
+      back: "Back",
+      title: "Enter Your Seed Phrase",
+      description: "Enter your 12-word seed phrase or Base58 encoded private key.",
+      label: "Seed Phrase or Private Key",
+      placeholder: "Enter your 12-word seed phrase or Base58 private key",
+      importWallet: "Import Wallet"
+    },
+    importNickname: {
+      back: "Back",
+      title: "Import Wallet",
+      description: "Give your imported wallet a name",
+      label: "Wallet Nickname",
+      placeholder: "e.g., My Imported Wallet",
+      continue: "Continue"
+    },
+    nickname: {
+      back: "Back",
+      title: "Name Your Wallet",
+      description: "Give your wallet a memorable name",
+      label: "Wallet Nickname",
+      placeholder: "e.g., My Main Wallet",
+      continue: "Continue"
+    },
+    seedPhrase: {
+      back: "Back",
+      title: "Your Seed Phrase",
+      description: "Save this phrase in a safe place. Never share it with anyone. You'll need it to recover your wallet.",
+      reveal: "Click to reveal",
+      copied: "Copied",
+      copyPhrase: "Copy Phrase",
+      download: "Download as File",
+      saved: "I've Saved My Phrase"
+    },
+    setupLoading: {
+      title: "Setting Up Your Wallet",
+      description: "Please wait while we secure your wallet..."
+    },
+    verifySeed: {
+      back: "Back",
+      title: "Verify Your Seed Phrase",
+      description: "Enter the words at the positions shown below",
+      word: "Word #{{index}}",
+      placeholder: "Enter word #{{index}}",
+      verify: "Verify Phrase"
+    }
+  },
+  nft: {
+    title: "NFTs",
+    comingSoon: "Coming Soon",
+    description: "NFT support is coming to Gorbag Wallet"
+  }
+};

@@ -4,6 +4,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { ChevronLeft, Check, X } from "lucide-react";
 import { getRandomSeedIndices } from "~/lib/utils/wallet-utils";
+import { useI18n } from "~/i18n/context";
 
 interface VerifySeedStepProps {
   seedPhrase: string[];
@@ -12,6 +13,7 @@ interface VerifySeedStepProps {
 }
 
 export function VerifySeedStep({ seedPhrase, onVerified, onBack }: VerifySeedStepProps) {
+  const { t } = useI18n();
   const [indices, setIndices] = useState<number[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [verified, setVerified] = useState<Record<number, boolean>>({});
@@ -50,21 +52,21 @@ export function VerifySeedStep({ seedPhrase, onVerified, onBack }: VerifySeedSte
     <div className="plasmo-w-full">
       <button onClick={onBack} className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-text-muted-foreground hover:plasmo-text-foreground plasmo-mb-6">
         <ChevronLeft className="plasmo-h-4 plasmo-w-4" />
-        Back
+        {t("onboarding.verifySeed.back")}
       </button>
 
       <div className="plasmo-mb-8">
-        <h2 className="plasmo-text-2xl plasmo-font-bold plasmo-text-foreground plasmo-mb-2">Verify Your Seed Phrase</h2>
-        <p className="plasmo-text-muted-foreground plasmo-text-sm">Enter the words at the positions shown below</p>
+        <h2 className="plasmo-text-2xl plasmo-font-bold plasmo-text-foreground plasmo-mb-2">{t("onboarding.verifySeed.title")}</h2>
+        <p className="plasmo-text-muted-foreground plasmo-text-sm">{t("onboarding.verifySeed.description")}</p>
       </div>
 
       <div className="plasmo-space-y-4 plasmo-mb-6">
         {indices.map((idx) => (
           <div key={idx}>
-            <Label className="plasmo-text-foreground plasmo-mb-2 plasmo-block">Word #{idx + 1}</Label>
+            <Label className="plasmo-text-foreground plasmo-mb-2 plasmo-block">{t("onboarding.verifySeed.word", { index: idx + 1 })}</Label>
             <div className="plasmo-relative">
               <Input
-                placeholder={`Enter word #${idx + 1}`}
+                placeholder={t("onboarding.verifySeed.placeholder", { index: idx + 1 })}
                 value={answers[idx] || ""}
                 onChange={(e) => setAnswers({ ...answers, [idx]: e.target.value })}
                 className="plasmo-h-12 plasmo-pr-10"
@@ -90,7 +92,7 @@ export function VerifySeedStep({ seedPhrase, onVerified, onBack }: VerifySeedSte
         className={`plasmo-w-full plasmo-h-12 ${
           isAnimating ? "animate-pop" : ""
         }`}>
-        Verify Phrase
+        {t("onboarding.verifySeed.verify")}
       </Button>
     </div>
   );

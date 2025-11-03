@@ -238,21 +238,21 @@ export function SendModal({ open, onClose }: SendModalProps) {
         {step === "input" && (
           <>
             <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-6">
-              <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">Send Tokens</h2>
+              <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">{t("send.title")}</h2>
               <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
-                <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt="Close" />
+                <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt={t("common.close")} />
               </Button>
             </div>
 
             <div className="plasmo-space-y-4">
               <div>
                 <Label htmlFor="recipient" className="plasmo-text-sm plasmo-font-medium plasmo-text-card-foreground plasmo-mb-2 plasmo-block">
-                  Recipient Address
+                  {t("send.recipientAddress")}
                 </Label>
                 <div className="plasmo-relative">
                   <Input
                     id="recipient"
-                    placeholder="Enter wallet address"
+                    placeholder={t("send.enterAddress")}
                     value={address}
                     onChange={(e) => handleAddressChange(e.target.value)}
                     className="plasmo-h-12 plasmo-rounded-xl plasmo-bg-background plasmo-border-border plasmo-pr-10"
@@ -271,17 +271,17 @@ export function SendModal({ open, onClose }: SendModalProps) {
 
               <div>
                 <Label htmlFor="amount" className="plasmo-text-sm plasmo-font-medium plasmo-text-card-foreground plasmo-mb-2 plasmo-block">
-                  Amount
+                  {t("send.amount")}
                 </Label>
                 <div className="plasmo-flex plasmo-gap-2 plasmo-mb-2">
                   <Button variant="outline" size="sm" onClick={() => handlePercentage(20)} className="plasmo-text-xs plasmo-h-8">
-                    20%
+                    {t("send.twentyPercent")}
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => handlePercentage(50)} className="plasmo-text-xs plasmo-h-8">
-                    50%
+                    {t("send.fiftyPercent")}
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => handlePercentage(100)} className="plasmo-text-xs plasmo-h-8">
-                    MAX
+                    {t("common.max")}
                   </Button>
                 </div>
                 <div className="plasmo-relative">
@@ -302,17 +302,17 @@ export function SendModal({ open, onClose }: SendModalProps) {
                     {useDollar ? "$" : network === "gorbagana" ? "GOR" : "SOL"}
                   </Button>
                 </div>
-                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mt-2">Available: {nativeTokenAmount.toFixed(6)} {network === "gorbagana" ? "GOR" : "SOL"}</p>
+                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mt-2">{t("send.balance", { balance: nativeTokenAmount.toFixed(6), symbol: nativeTokenSymbol })}</p>
               </div>
 
               <div className="plasmo-bg-muted plasmo-rounded-xl plasmo-p-4">
                 <div className="plasmo-flex plasmo-justify-between plasmo-text-sm plasmo-mb-2">
-                  <span className="plasmo-text-muted-foreground">Network Fee</span>
-                  <span className="plasmo-text-card-foreground plasmo-font-medium">~0.000005 {network === "gorbagana" ? "GOR" : "SOL"}</span>
+                  <span className="plasmo-text-muted-foreground">{t("send.networkFee")}</span>
+                  <span className="plasmo-text-card-foreground plasmo-font-medium">~0.000005 {nativeTokenSymbol}</span>
                 </div>
                 <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                  <span className="plasmo-text-muted-foreground">Total</span>
-                  <span className="plasmo-text-card-foreground plasmo-font-semibold">{amount || "0.00"} {network === "gorbagana" ? "GOR" : "SOL"}</span>
+                  <span className="plasmo-text-muted-foreground">{t("send.total")}</span>
+                  <span className="plasmo-text-card-foreground plasmo-font-semibold">{amount || "0.00"} {nativeTokenSymbol}</span>
                 </div>
               </div>
 
@@ -321,7 +321,7 @@ export function SendModal({ open, onClose }: SendModalProps) {
                 disabled={!address || !amount || addressValid !== true || parseFloat(amount) <= 0 || parseFloat(amount) > nativeTokenAmount}
                 className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-font-medium"
               >
-                Continue
+                {t("common.continue")}
                 <img src={continueIcon} className="plasmo-h-4 plasmo-w-4 plasmo-ml-2" alt="Continue" />
               </Button>
             </div>
@@ -400,11 +400,11 @@ export function SendModal({ open, onClose }: SendModalProps) {
             <div className="plasmo-w-12 plasmo-h-12 plasmo-rounded-full plasmo-bg-destructive/20 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-mb-4">
               <img src={errorIcon} className="plasmo-h-6 plasmo-w-6" alt="Error" />
             </div>
-            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">Transaction Failed</h3>
-            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">{error || "Something went wrong"}</p>
+            <h3 className="plasmo-text-lg plasmo-font-semibold plasmo-text-card-foreground plasmo-mb-1">{t("send.transactionFailed")}</h3>
+            <p className="plasmo-text-sm plasmo-text-muted-foreground plasmo-mb-6">{error || t("send.somethingWentWrong")}</p>
             {txHash && (
               <div className="plasmo-mb-4 plasmo-text-center">
-                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mb-1">Transaction Hash</p>
+                <p className="plasmo-text-xs plasmo-text-muted-foreground plasmo-mb-1">{t("activity.transactionHash")}</p>
                 <a 
                   href={`${networks[network].explorer}${txHash}`} 
                   target="_blank" 
@@ -416,10 +416,10 @@ export function SendModal({ open, onClose }: SendModalProps) {
               </div>
             )}
             <Button onClick={() => setStep("input")} variant="outline" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-mb-2">
-              Try Again
+              {t("common.tryAgain")}
             </Button>
             <Button onClick={onClose} variant="ghost" className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl">
-              Close
+              {t("common.close")}
             </Button>
           </div>
         )}

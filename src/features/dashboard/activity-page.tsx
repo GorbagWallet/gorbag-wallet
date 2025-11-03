@@ -5,6 +5,7 @@ import { ChevronLeft, ArrowUpRight, ArrowDownLeft, ExternalLink } from "lucide-r
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { useWallet } from "~/lib/wallet-context"
+import { useI18n } from "~/i18n/context"
 
 interface ActivityItem {
   signature: string;
@@ -24,6 +25,7 @@ interface ActivityItem {
 }
 
 export default function ActivityPage({ onBack }: { onBack: () => void }) {
+  const { t } = useI18n()
   const { getTransactionHistory, network, activeWallet } = useWallet();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [filter, setFilter] = useState<"all" | "sent" | "received">("all");
@@ -53,14 +55,14 @@ export default function ActivityPage({ onBack }: { onBack: () => void }) {
               network
             );
             
-            const timestamp = tx.blockTime ? new Date(tx.blockTime * 1000).toLocaleString() : "Unknown";
+            const timestamp = tx.blockTime ? new Date(tx.blockTime * 1000).toLocaleString() : t("activity.unknown");
             
             return {
               ...tx,
               type: parsedInfo.type,
               token: parsedInfo.tokenSymbol,
               amount: parsedInfo.amount,
-              address: parsedInfo.counterparty ? `${parsedInfo.counterparty.slice(0, 4)}...${parsedInfo.counterparty.slice(-4)}` : "Unknown",
+              address: parsedInfo.counterparty ? `${parsedInfo.counterparty.slice(0, 4)}...${parsedInfo.counterparty.slice(-4)}` : t("activity.unknown"),
               timestamp,
               status: tx.status
             };
@@ -71,14 +73,14 @@ export default function ActivityPage({ onBack }: { onBack: () => void }) {
         setError(null);
       } catch (err) {
         console.error("Error fetching transaction history:", err);
-        setError("Failed to load transaction history. Please try again.");
+        setError(t("activity.error"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchHistory();
-  }, [getTransactionHistory, network, activeWallet]);
+  }, [getTransactionHistory, network, activeWallet, t]);
 
   const filtered = activities.filter((a) => filter === "all" || a.type === filter);
 
@@ -96,14 +98,14 @@ export default function ActivityPage({ onBack }: { onBack: () => void }) {
         <Button variant="ghost" size="icon" onClick={onBack} className="plasmo-rounded-xl">
           <ChevronLeft className="plasmo-h-5 plasmo-w-5" />
         </Button>
-        <h1 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">Recent Activity</h1>
+        <h1 className="plasmo-text-lg plasmo-font-semibold plasmo-text-foreground">{t("activity.title")}</h1>
         <div className="plasmo-w-10" />
       </header>
 
       <div className="plasmo-px-4 plasmo-py-4">
         {loading ? (
           <div className="plasmo-flex plasmo-justify-center plasmo-items-center plasmo-h-40">
-            <p className="plasmo-text-muted-foreground">Loading transaction history...</p>
+            <p className="plasmo-text-muted-foreground">{t("activity.loading")}</p>
           </div>
         ) : error ? (
           <div className="plasmo-flex plasmo-justify-center plasmo-items-center plasmo-h-40">
@@ -113,14 +115,14 @@ export default function ActivityPage({ onBack }: { onBack: () => void }) {
           <>
             <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="plasmo-w-full">
               <TabsList className="plasmo-grid plasmo-w-full plasmo-grid-cols-3">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="sent">Sent</TabsTrigger>
-                <TabsTrigger value="received">Received</TabsTrigger>
+                <TabsTrigger value="all">{t("activity.all")}</TabsTrigger>
+                <TabsTrigger value="sent">{t("activity.sent")}</TabsTrigger>
+                <TabsTrigger value="received">{t("activity.received")}</TabsTrigger>
               </TabsList>
               <TabsContent value={filter} className="plasmo-space-y-3 plasmo-mt-4">
                 {filtered.length === 0 ? (
                   <div className="plasmo-flex plasmo-justify-center plasmo-items-center plasmo-h-40 plasmo-text-muted-foreground">
-                    No transaction history found
+                    {t("activity.noHistory")}
                   </div>
                 ) : (
                   filtered.map((activity) => (
@@ -146,15 +148,14 @@ export default function ActivityPage({ onBack }: { onBack: () => void }) {
                           </div>
                           <div>
                             <p className="plasmo-font-semibold plasmo-text-foreground plasmo-capitalize">
-                              {activity.type} {activity.token}
+                              {t(`activity.${activity.type}`)} {activity.token}
                             </p>
                             <p className="plasmo-text-xs plasmo-text-muted-foreground">{activity.address}</p>
                           </div>
                         </div>
                         <div className="plasmo-text-right">
                           <p className={`plasmo-font-semibold ${activity.type === "sent" ? "plasmo-text-destructive" : "plasmo-text-green-500"}`}>
-                            {activity.type === "sent" ? "-" : "+"}
-                            {activity.amount}
+                            {t("activity.amount", { sign: activity.type === "sent" ? "-" : "+", amount: activity.amount })}
                           </p>
                           <p className="plasmo-text-xs plasmo-text-muted-foreground">{activity.timestamp}</p>
                           <ExternalLink className="plasmo-ml-2 plasmo-h-3 plasmo-w-3 plasmo-text-muted-foreground" />

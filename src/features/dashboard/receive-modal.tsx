@@ -9,6 +9,7 @@ import successIcon from "data-base64:~assets/icons/icons8-success-24.png"
 import copyIcon from "data-base64:~assets/icons/icons8-copy-24.png"
 import gorLogo from "data-base64:~assets/token-icons/gor.jpg"
 import solLogo from "data-base64:~assets/token-icons/sol.png"
+import { useI18n } from "~/i18n/context"
 
 interface ReceiveModalProps {
   open: boolean
@@ -16,6 +17,7 @@ interface ReceiveModalProps {
 }
 
 export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
+  const { t } = useI18n()
   const { activeWallet, network } = useWallet()
   const [copied, setCopied] = useState(false)
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null)
@@ -55,7 +57,7 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
     <div className="plasmo-fixed plasmo-inset-0 plasmo-bg-background/80 plasmo-backdrop-blur-sm plasmo-z-50 plasmo-flex plasmo-items-end sm:plasmo-items-center plasmo-justify-center">
       <div className="plasmo-bg-card plasmo-w-full plasmo-max-w-md plasmo-rounded-t-3xl sm:plasmo-rounded-3xl plasmo-p-6 plasmo-animate-in plasmo-slide-in-from-bottom duration-300 sm:plasmo-slide-in-bottom-0">
         <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-mb-6">
-          <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">Receive Tokens</h2>
+          <h2 className="plasmo-text-xl plasmo-font-semibold plasmo-text-card-foreground">{t("receive.title")}</h2>
           <Button variant="ghost" size="icon" onClick={onClose} className="plasmo-rounded-xl">
             <img src={closeIcon} className="plasmo-h-5 plasmo-w-5" alt="Close" />
           </Button>
@@ -82,14 +84,14 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
                 </div>
               ) : (
                 <div className="plasmo-w-48 plasmo-h-48 plasmo-bg-background plasmo-rounded-lg plasmo-flex plasmo-items-center plasmo-justify-center">
-                  <span className="plasmo-text-muted-foreground">Generating QR...</span>
+                  <span className="plasmo-text-muted-foreground">{t("receive.generatingQR")}</span>
                 </div>
               )}
             </div>
           </div>
 
           <div>
-            <p className="plasmo-text-sm plasmo-font-medium plasmo-text-card-foreground plasmo-mb-2">Your Address</p>
+            <p className="plasmo-text-sm plasmo-font-medium plasmo-text-card-foreground plasmo-mb-2">{t("receive.yourAddress")}</p>
             <div className="plasmo-bg-background plasmo-rounded-xl plasmo-p-4 plasmo-font-mono plasmo-text-sm plasmo-text-foreground plasmo-overflow-x-auto plasmo-whitespace-nowrap plasmo-text-ellipsis">
               {activeWallet?.address}
             </div>
@@ -97,17 +99,16 @@ export function ReceiveModal({ open, onClose }: ReceiveModalProps) {
 
           <Button
             onClick={copyAddress}
-            className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-flex plasmo-items-center plasmo-justify-center"
-          >
+            className="plasmo-w-full plasmo-h-12 plasmo-rounded-xl plasmo-flex plasmo-items-center plasmo-justify-center">
             {copied ? (
               <>
                 <img src={successIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Copied" />
-                Copied!
+                {t("common.copied")}
               </>
             ) : (
               <>
                 <img src={copyIcon} className="plasmo-h-4 plasmo-w-4 plasmo-mr-2" alt="Copy" />
-                Copy Address
+                {t("receive.copyAddress")}
               </>
             )}
           </Button>

@@ -1,0 +1,200 @@
+export const da = {
+  common: {
+    send: "Send",
+    receive: "Modtag",
+    swap: "Byt",
+    back: "Tilbage",
+    close: "Luk",
+    done: "Færdig",
+    continue: "Fortsæt",
+    cancel: "Annuller",
+    copy: "Kopiér",
+    copied: "Kopieret!",
+    settings: "Indstillinger",
+    loading: "Indlæser...",
+    error: "Fejl",
+    success: "Succes",
+    failed: "Mislykkedes",
+    tryAgain: "Prøv igen",
+    max: "MAKS"
+  },
+  wallet: {
+    title: "Gorbag-tegnebog",
+    dashboard: "Dashboard",
+    activity: "Aktivitet",
+    tokens: "Tokens",
+    manageTokens: "Administrer tokens",
+    yourTokens: "Dine tokens",
+    portfolioValue: "Porteføljeværdi",
+    totalBalance: "Samlet saldo",
+    todayChange: "+{{change}}% i dag",
+    sendTokens: "Send tokens",
+    receiveTokens: "Modtag tokens",
+    hideTokens: "Skjul tokens",
+    network: "Netværk",
+    networkSolana: "Solana-netværk",
+    networkGorbagana: "Gorbagana-netværk"
+  },
+  send: {
+    title: "Send tokens",
+    recipientAddress: "Modtageradresse",
+    enterAddress: "Indtast tegnebogsadresse",
+    amount: "Beløb",
+    networkFee: "Netværksgebyr",
+    total: "I alt",
+    twentyPercent: "20%",
+    fiftyPercent: "50%",
+    balance: "Tilgængelig: {{balance}} {{symbol}}",
+    invalidAddress: "Ugyldig modtageradresse",
+    insufficientBalance: "Utilstrækkelig saldo",
+    insufficientFees: "Utilstrækkelig {{symbol}} til transaktionsgebyrer. Minimum {{min}} {{symbol}} kræves.",
+    transactionConfirmed: "Transaktion bekræftet!",
+    tokensSent: "Dine tokens er blevet sendt",
+    transactionFailed: "Transaktion mislykkedes",
+    somethingWentWrong: "Noget gik galt",
+    signAndConfirm: "Underskriv & bekræft transaktion",
+    simulation: "Simulere transaktion",
+    checkingViability: "Tjekker transaktionsmulighed...",
+    simulated: "Transaktion simuleret",
+    simulationSuccess: "Simulering gennemført",
+    from: "Sender {{amount}} {{symbol}} til {{address}}",
+    confirming: "Bekræfter transaktion",
+    pleaseConfirm: "Bekræft venligst i tegnebogen..."
+  },
+  receive: {
+    title: "Modtag tokens",
+    generatingQR: "Genererer QR...",
+    yourAddress: "Din adresse",
+    copyAddress: "Kopiér adresse"
+  },
+  swap: {
+    title: "Byt tokens",
+    from: "Fra",
+    to: "Til",
+    slippage: "Slippage-tolerance",
+    priorityFee: "Prioritetsgebyr",
+    rate: "Kurs",
+    networkFee: "Netværksgebyr",
+    twentyFivePercent: "25%",
+    slippageTolerance: "Slippage-tolerance: {{slippage}}%",
+    swappingNotAvailable: "Bytning ikke tilgængelig",
+    networkNotice: "Netværksmeddelelse",
+    swapNetworkNotice: "Bytning er endnu ikke tilgængelig på Gorbagana-netværket. Skift til Solana-netværket for at bruge bytningsfunktioner.",
+    swapButton: "Byt"
+  },
+  activity: {
+    title: "Seneste aktivitet",
+    loading: "Indlæser transaktionshistorik...",
+    error: "Kunne ikke indlæse transaktionshistorik. Prøv venligst igen.",
+    all: "Alle",
+    sent: "Sendt",
+    received: "Modtaget",
+    noHistory: "Ingen transaktionshistorik fundet",
+    unknown: "Ukendt",
+    amount: "{{sign}}{{amount}}",
+    transactionHash: "Transaktionshash"
+  },
+  settings: {
+    title: "Indstillinger",
+    preferences: "Præferencer",
+    activeNetworks: "Aktive netværk",
+    general: "Generelt",
+    language: "Sprog",
+    security: "Sikkerhed",
+    about: "Om",
+    version: "Version",
+    theme: "Tema",
+    currency: "Valuta",
+    currencies: {
+      usd: "USD - Amerikanske Dollar",
+      gbp: "GBP - Britiske Pund",
+      ngn: "NGN - Nigerianske Naira",
+      eur: "EUR - Euro",
+      jpy: "JPY - Japanske Yen"
+    },
+    security: {
+      title: "Sikkerhed",
+      walletPassword: "Tegnebogsadgangskode",
+      passwordSet: "Indstil",
+      changePassword: "Skift adgangskode",
+      setPassword: "Indstil adgangskode",
+      enterPassword: "Indtast adgangskode",
+      confirmPassword: "Bekræft adgangskode",
+      passwordsDoNotMatch: "Adgangskoderne stemmer ikke overens",
+      passwordTooShort: "Adgangskoden skal være på mindst 6 tegn",
+      cancel: "Annuller",
+      save: "Gem",
+      autoLockTimer: "Auto-lås timer",
+      immediately: "Øjeblikkeligt",
+      minutes: "{{count}} minutter",
+      hour: "{{count}} time",
+      hours: "{{count}} timer"
+    }
+  },
+  errors: {
+    invalidAddress: "Ugyldig tegnebogsadresse",
+    insufficientFunds: "Utilstrækkelige midler",
+    transactionFailed: "Transaktion mislykkedes",
+    networkError: "Netværksfejl",
+    unknownError: "Der opstod en ukendt fejl"
+  },
+  languages: {
+    en: "Engelsk",
+    da: "Dansk",
+    fr: "Fransk",
+    es: "Spansk"
+  },
+  onboarding: {
+    importKey: {
+      back: "Tilbage",
+      title: "Indtast din seed phrase",
+      description: "Indtast din 12-ords seed phrase eller Base58-kodede private nøgle.",
+      label: "Seed phrase eller privat nøgle",
+      placeholder: "Indtast din 12-ords seed phrase eller Base58 private nøgle",
+      importWallet: "Importer tegnebog"
+    },
+    importNickname: {
+      back: "Tilbage",
+      title: "Importer tegnebog",
+      description: "Giv din importerede tegnebog et navn",
+      label: "Tegnebogs kaldenavn",
+      placeholder: "f.eks. Min importerede tegnebog",
+      continue: "Fortsæt"
+    },
+    nickname: {
+      back: "Tilbage",
+      title: "Navngiv din tegnebog",
+      description: "Giv din tegnebog et mindeværdigt navn",
+      label: "Tegnebogs kaldenavn",
+      placeholder: "f.eks. Min hovedtegnebog",
+      continue: "Fortsæt"
+    },
+    seedPhrase: {
+      back: "Tilbage",
+      title: "Din seed phrase",
+      description: "Gem denne sætning et sikkert sted. Del den aldrig med nogen. Du skal bruge den til at gendanne din tegnebog.",
+      reveal: "Klik for at afsløre",
+      copied: "Kopieret",
+      copyPhrase: "Kopiér sætning",
+      download: "Download som fil",
+      saved: "Jeg har gemt min sætning"
+    },
+    setupLoading: {
+      title: "Opretter din tegnebog",
+      description: "Vent venligst, mens vi sikrer din tegnebog..."
+    },
+    verifySeed: {
+      back: "Tilbage",
+      title: "Verificer din seed phrase",
+      description: "Indtast ordene på de viste positioner nedenfor",
+      word: "Ord #{{index}}",
+      placeholder: "Indtast ord #{{index}}",
+      verify: "Verificer sætning"
+    }
+  },
+  nft: {
+    title: "NFT'er",
+    comingSoon: "Kommer snart",
+    description: "NFT-support kommer til Gorbag Wallet"
+  }
+};

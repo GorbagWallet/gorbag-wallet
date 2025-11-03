@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { WalletProvider, useWallet } from "~lib/wallet-context"
+import { I18nProvider } from "~i18n/context"
 import { Onboarding } from "~features/onboarding"
 import { DashboardHeader } from "~/features/dashboard/dashboard-header"
 import { PortfolioBalance } from "~/features/dashboard/portfolio-balance"
@@ -93,9 +94,11 @@ const App = () => {
 
 const IndexPopup = () => {
   return (
-    <WalletProvider>
-      <App />
-    </WalletProvider>
+    <I18nProvider>
+      <WalletProvider>
+        <App />
+      </WalletProvider>
+    </I18nProvider>
   )
 }
 

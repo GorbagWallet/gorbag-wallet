@@ -1,0 +1,200 @@
+export const fr = {
+  common: {
+    send: "Envoyer",
+    receive: "Recevoir",
+    swap: "Échanger",
+    back: "Retour",
+    close: "Fermer",
+    done: "Terminé",
+    continue: "Continuer",
+    cancel: "Annuler",
+    copy: "Copier",
+    copied: "Copié !",
+    settings: "Paramètres",
+    loading: "Chargement...",
+    error: "Erreur",
+    success: "Succès",
+    failed: "Échec",
+    tryAgain: "Réessayer",
+    max: "MAX"
+  },
+  wallet: {
+    title: "Portefeuille Gorbag",
+    dashboard: "Tableau de bord",
+    activity: "Activité",
+    tokens: "Jetons",
+    manageTokens: "Gérer les jetons",
+    yourTokens: "Vos jetons",
+    portfolioValue: "Valeur du portefeuille",
+    totalBalance: "Solde total",
+    todayChange: "+{{change}}% aujourd'hui",
+    sendTokens: "Envoyer des jetons",
+    receiveTokens: "Recevoir des jetons",
+    hideTokens: "Masquer les jetons",
+    network: "Réseau",
+    networkSolana: "Réseau Solana",
+    networkGorbagana: "Réseau Gorbagana"
+  },
+  send: {
+    title: "Envoyer des jetons",
+    recipientAddress: "Adresse du destinataire",
+    enterAddress: "Saisir l'adresse du portefeuille",
+    amount: "Montant",
+    networkFee: "Frais de réseau",
+    total: "Total",
+    twentyPercent: "20%",
+    fiftyPercent: "50%",
+    balance: "Disponible : {{balance}} {{symbol}}",
+    invalidAddress: "Adresse de destinataire invalide",
+    insufficientBalance: "Solde insuffisant",
+    insufficientFees: "Solde {{symbol}} insuffisant pour les frais de transaction. Minimum {{min}} {{symbol}} requis.",
+    transactionConfirmed: "Transaction confirmée !",
+    tokensSent: "Vos jetons ont été envoyés",
+    transactionFailed: "Échec de la transaction",
+    somethingWentWrong: "Une erreur s'est produite",
+    signAndConfirm: "Signer et confirmer la transaction",
+    simulation: "Simulation de la transaction",
+    checkingViability: "Vérification de la viabilité de la transaction...",
+    simulated: "Transaction simulée",
+    simulationSuccess: "Simulation réussie",
+    from: "Envoi de {{amount}} {{symbol}} à {{address}}",
+    confirming: "Confirmation de la transaction",
+    pleaseConfirm: "Veuillez confirmer dans le portefeuille..."
+  },
+  receive: {
+    title: "Recevoir des jetons",
+    generatingQR: "Génération du QR...",
+    yourAddress: "Votre adresse",
+    copyAddress: "Copier l'adresse"
+  },
+  swap: {
+    title: "Échanger des jetons",
+    from: "De",
+    to: "À",
+    slippage: "Tolérance de slippage",
+    priorityFee: "Frais prioritaires",
+    rate: "Taux",
+    networkFee: "Frais de réseau",
+    twentyFivePercent: "25%",
+    slippageTolerance: "Tolérance de slippage : {{slippage}}%",
+    swappingNotAvailable: "Échange indisponible",
+    networkNotice: "Avis de réseau",
+    swapNetworkNotice: "L'échange n'est pas encore disponible sur le réseau Gorbagana. Veuillez basculer sur le réseau Solana pour utiliser les fonctionnalités d'échange.",
+    swapButton: "Échanger"
+  },
+  activity: {
+    title: "Activité récente",
+    loading: "Chargement de l'historique des transactions...",
+    error: "Échec du chargement de l'historique des transactions. Veuillez réessayer.",
+    all: "Tout",
+    sent: "Envoyé",
+    received: "Reçu",
+    noHistory: "Aucun historique de transaction trouvé",
+    unknown: "Inconnu",
+    amount: "{{sign}}{{amount}}",
+    transactionHash: "Hash de transaction"
+  },
+  settings: {
+    title: "Paramètres",
+    preferences: "Préférences",
+    activeNetworks: "Réseaux actifs",
+    general: "Général",
+    language: "Langue",
+    security: "Sécurité",
+    about: "À propos",
+    version: "Version",
+    theme: "Thème",
+    currency: "Devise",
+    currencies: {
+      usd: "USD - Dollar américain",
+      gbp: "GBP - Livre sterling",
+      ngn: "NGN - Naira nigérian",
+      eur: "EUR - Euro",
+      jpy: "JPY - Yen japonais"
+    },
+    security: {
+      title: "Sécurité",
+      walletPassword: "Mot de passe du portefeuille",
+      passwordSet: "Défini",
+      changePassword: "Changer le mot de passe",
+      setPassword: "Définir le mot de passe",
+      enterPassword: "Entrez le mot de passe",
+      confirmPassword: "Confirmez le mot de passe",
+      passwordsDoNotMatch: "Les mots de passe ne correspondent pas",
+      passwordTooShort: "Le mot de passe doit comporter au moins 6 caractères",
+      cancel: "Annuler",
+      save: "Enregistrer",
+      autoLockTimer: "Minuterie de verrouillage automatique",
+      immediately: "Immédiatement",
+      minutes: "{{count}} minutes",
+      hour: "{{count}} heure",
+      hours: "{{count}} heures"
+    }
+  },
+  errors: {
+    invalidAddress: "Adresse de portefeuille invalide",
+    insufficientFunds: "Fonds insuffisants",
+    transactionFailed: "Échec de la transaction",
+    networkError: "Erreur de réseau",
+    unknownError: "Une erreur inconnue s'est produite"
+  },
+  languages: {
+    en: "Anglais",
+    da: "Danois",
+    fr: "Français",
+    es: "Espagnol"
+  },
+  onboarding: {
+    importKey: {
+      back: "Retour",
+      title: "Entrez votre phrase de départ",
+      description: "Entrez votre phrase de départ de 12 mots ou votre clé privée encodée en Base58.",
+      label: "Phrase de départ ou clé privée",
+      placeholder: "Entrez votre phrase de départ de 12 mots ou votre clé privée Base58",
+      importWallet: "Importer le portefeuille"
+    },
+    importNickname: {
+      back: "Retour",
+      title: "Importer le portefeuille",
+      description: "Donnez un nom à votre portefeuille importé",
+      label: "Surnom du portefeuille",
+      placeholder: "par ex., Mon portefeuille importé",
+      continue: "Continuer"
+    },
+    nickname: {
+      back: "Retour",
+      title: "Nommez votre portefeuille",
+      description: "Donnez à votre portefeuille un nom mémorable",
+      label: "Surnom du portefeuille",
+      placeholder: "par ex., Mon portefeuille principal",
+      continue: "Continuer"
+    },
+    seedPhrase: {
+      back: "Retour",
+      title: "Votre phrase de départ",
+      description: "Conservez cette phrase en lieu sûr. Ne la partagez jamais avec qui que ce soit. Vous en aurez besoin pour récupérer votre portefeuille.",
+      reveal: "Cliquez pour révéler",
+      copied: "Copié",
+      copyPhrase: "Copier la phrase",
+      download: "Télécharger en tant que fichier",
+      saved: "J'ai sauvegardé ma phrase"
+    },
+    setupLoading: {
+      title: "Configuration de votre portefeuille",
+      description: "Veuillez patienter pendant que nous sécurisons votre portefeuille..."
+    },
+    verifySeed: {
+      back: "Retour",
+      title: "Vérifiez votre phrase de départ",
+      description: "Entrez les mots aux positions indiquées ci-dessous",
+      word: "Mot #{{index}}",
+      placeholder: "Entrez le mot #{{index}}",
+      verify: "Vérifier la phrase"
+    },
+    nft: {
+      title: "NFTs",
+      comingSoon: "Bientôt disponible",
+      description: "Le support NFT arrive sur Gorbag Wallet"
+    }
+  }
+};
