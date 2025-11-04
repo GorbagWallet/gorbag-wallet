@@ -91,6 +91,35 @@ To build for production:
 pnpm build
 ```
 
+### Testing
+
+Gorbag Wallet includes a comprehensive test suite to ensure reliability and correctness of core functionality.
+
+#### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode (re-run on file changes)
+pnpm test:watch
+
+# Run tests with coverage report
+pnpm test:coverage
+```
+
+#### Test Coverage
+
+The test suite covers the following areas:
+
+- **Currency & Token Services**: Token value calculations, portfolio management, and API fallback mechanisms
+- **Wallet Configuration**: Network configurations, token data structures, and constants
+- **Token Utilities**: Token amount formatting, value conversion, and utility functions  
+- **Security Features**: Wallet data structures and security-related configurations
+- **API Integration**: Mocked external API calls with proper fallback handling
+
+All tests focus on core business logic rather than UI components, ensuring the wallet's critical functions work reliably. The test suite includes 44 tests across 5 test suites, providing comprehensive coverage of the wallet's core functionality.
+
 ### Contributing
 
 This project is open-source under the GPL v3 license. Contributions are welcome! Please feel free to submit pull requests or open issues to improve the wallet.
