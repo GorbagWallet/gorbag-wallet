@@ -37,3 +37,6 @@ current_stage.txt
 final-test.js
 /docs
 accent-color.txt
+
+# env
+.env

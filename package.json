@@ -2,13 +2,17 @@
   "name": "gorbag-wallet",
   "displayName": "Gorbag Wallet",
   "version": "0.0.1",
-  "description": "Powerful Gorbagana Native Wallet",
+  "description": "Non-custodial Powerful Gorbagana-Native Wallet",
   "author": "David Nzube",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
     "package": "plasmo package",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "firefox-build": "plasmo dev --target=firefox-mv2",
+    "chrome-build": "plasmo dev --target=chrome-mv3",
+    "xpi-build": "cd build/firefox-mv2-prod && web-ext build",
+    "xpi-sign": "source .env && echo 'remember to add the $FIREFOX_API_KEY and $FIREFOX_API_SECRET envs' && cd build/firefox-mv2-prod && web-ext sign --api-key=$FIREFOX_API_KEY --api-secret=$FIREFOX_API_SECRET"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
