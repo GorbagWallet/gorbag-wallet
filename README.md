@@ -120,6 +120,8 @@ The test suite covers the following areas:
 
 All tests focus on core business logic rather than UI components, ensuring the wallet's critical functions work reliably. The test suite includes 44 tests across 5 test suites, providing comprehensive coverage of the wallet's core functionality.
 
+Based on the coverage report, the tests provide significant coverage of the core logic files (especially `currency.ts` at ~74% coverage) while intentionally leaving UI components untested to focus on critical business logic. The overall project coverage is approximately 5%, which reflects the focus on core services rather than UI components.
+
 ### Contributing
 
 This project is open-source under the GPL v3 license. Contributions are welcome! Please feel free to submit pull requests or open issues to improve the wallet.
