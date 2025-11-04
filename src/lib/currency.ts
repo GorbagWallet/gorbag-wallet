@@ -174,8 +174,22 @@ export async function getTokenValue(token: Token, currency: string): Promise<num
 // Additional function to get detailed token information
 export async function getTokenDetails(symbol: string, currency: string = "usd") {
   const coinId = coinIdMap[symbol];
+  
+  // If symbol is not in the map, return basic info immediately
   if (!coinId) {
-    return null;
+    console.log(`No coin ID mapping for ${symbol}, returning basic info`);
+    return {
+      symbol,
+      name: symbol,
+      price: 0,
+      priceChange24h: 0,
+      marketCap: 0,
+      totalVolume: 0,
+      circulatingSupply: 0,
+      totalSupply: 0,
+      image: null,
+      lastUpdated: new Date().toISOString()
+    };
   }
 
   // Try different APIs in sequence as fallbacks

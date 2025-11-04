@@ -12,7 +12,10 @@
     "firefox-build": "plasmo dev --target=firefox-mv2",
     "chrome-build": "plasmo dev --target=chrome-mv3",
     "xpi-build": "cd build/firefox-mv2-prod && web-ext build",
-    "xpi-sign": "source .env && echo 'remember to add the $FIREFOX_API_KEY and $FIREFOX_API_SECRET envs' && cd build/firefox-mv2-prod && web-ext sign --api-key=$FIREFOX_API_KEY --api-secret=$FIREFOX_API_SECRET"
+    "xpi-sign": "source .env && echo 'remember to add the $FIREFOX_API_KEY and $FIREFOX_API_SECRET envs' && cd build/firefox-mv2-prod && web-ext sign --api-key=$FIREFOX_API_KEY --api-secret=$FIREFOX_API_SECRET",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -65,14 +68,20 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
     "@types/chrome": "^0.1.27",
+    "@types/jest": "^30.0.0",
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "patch-package": "^8.0.1",
     "postcss": "8.4.33",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^3.6.2",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "5.3.3"
