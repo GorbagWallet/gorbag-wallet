@@ -51,7 +51,7 @@ export function DashboardHeader({ balanceHidden, onBalanceToggle, onNavigate }: 
   const [open, setOpen] = useState(false)
 
   const handleAddWallet = () => {
-    setActiveWallet(null);
+    onNavigate("onboarding");
   }
 
   const handleLogout = () => {

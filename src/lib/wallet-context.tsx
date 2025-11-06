@@ -5,13 +5,14 @@ import { getBalance, getWalletTokens } from "./solana";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { networks } from "./config";
 import { getPortfolioValue, getTokenValue } from "./currency";
+import { encryptData, decryptData } from "./security-utils";
 
 export interface Wallet {
   id: string;
   nickname: string;
   address: string;
-  seedPhrase?: string;
-  privateKey?: string;
+  seedPhrase: string;
+  privateKey: string;
   createdAt: number;
   hiddenTokens?: string[];
 }
@@ -30,12 +31,12 @@ interface WalletContextType {
   setPreferredCurrency: (currency: string) => void;
   setNetwork: (network: Network) => void;
   setActiveWallet: (wallet: Wallet | null) => void;
-  addWallet: (wallet: Wallet) => void;
+  addWallet: (wallet: Wallet, password: string) => Promise<void>;
   updateWallet: (wallet: Wallet) => void;
   deleteWallet: (id: string) => void;
   toggleHiddenToken: (tokenId: string) => void;
   isTokenHidden: (tokenId: string) => boolean;
-  signTransaction: (transaction: any) => Promise<any>;
+  signTransaction: (transaction: any, password?: string) => Promise<any>;
   getTransactionHistory: () => Promise<any[]>;
   clearTransactionHistoryCache: () => void;
   // Function to manually refresh balances
@@ -55,26 +56,31 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
+import { Storage } from "@plasmohq/storage";
+import { createSession, getSession, deleteSession, isSessionExpired, updateSessionLastActive } from "./session-manager";
+
+const storage = new Storage({ area: "local" });
+
 export function WalletProvider({ children }: { children: React.ReactNode }) {
-  const [wallets, setWallets] = useStorage<Wallet[]>("gorbag_wallets", []);
+  const [wallets, setWallets] = useStorage<Wallet[]>({key: "gorbag_wallets", instance: storage}, []);
   const [activeWalletId, setActiveWalletId] = useStorage<string | null>(
-    "gorbag_active_wallet",
+    {key: "gorbag_active_wallet", instance: storage},
     null
   );
   const [network, setNetwork] = useStorage<Network>(
-    "gorbagana_network",
+    {key: "gorbagana_network", instance: storage},
     "gorbagana"
   );
   const [preferredCurrency, setPreferredCurrency] = useStorage<string>(
-    "gorbag_preferred_currency",
+    {key: "gorbag_preferred_currency", instance: storage},
     "usd"
   );
   // Security features  
-  const [passwordHash, setPasswordHash] = useStorage<string | null>("gorbag_password_hash", null);
-  const [autoLockTimer, setAutoLockTimer] = useStorage<string>("gorbag_auto_lock_timer", "immediately");
-  const [lastActiveTimeStorage, setLastActiveTimeStorage] = useStorage<number | null>("gorbag_last_active_time", null);
+  const [passwordHash, setPasswordHash] = useStorage<string | null>({key: "gorbag_password_hash", instance: storage}, null);
+  const [autoLockTimer, setAutoLockTimer] = useStorage<string>({key: "gorbag_auto_lock_timer", instance: storage}, "immediately");
+  const [lastActiveTimeStorage, setLastActiveTimeStorage] = useStorage<number | null>({key: "gorbag_last_active_time", instance: storage}, null);
   const [lastActiveTime, setLastActiveTimeState] = useState<number | null>(lastActiveTimeStorage); // Use useState for immediate updates
-  const [isLocked, setIsLocked] = useState(false);
+  const [isLocked, setIsLocked] = useState(false); // Start unlocked by default, will be updated by session check
   const [isUnlocking, setIsUnlocking] = useState(false); // Prevent auto-lock during unlock
   
   // Sync internal state with storage when storage changes
@@ -90,31 +96,43 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [tokens, setTokens] = useState<any[]>([]);
 
   // Add signing functionality that works for both seed phrase and private key imported wallets
-  async function signTransaction(transaction: any) {
+  async function signTransaction(transaction: any, password: string): Promise<any> {
     if (!activeWallet) {
       throw new Error("No active wallet available for signing");
     }
 
+    // If a password is provided, use it directly
+    // If no password is provided, try to get it from the current session
+    let signingPassword = password || "";
+    if (!signingPassword) {
+      const session = await getSession();
+      if (session) {
+        signingPassword = session.password;
+      }
+    }
+
+    if (!signingPassword) {
+      throw new Error("Password is required for signing");
+    }
+
     // Check if we have the seed phrase (for created wallets or seed phrase imported wallets)
     if (activeWallet.seedPhrase && activeWallet.seedPhrase.length > 0) {
-      // Derive the keypair from the seed phrase when needed
+      const decryptedSeedPhrase = await decryptData(activeWallet.seedPhrase, signingPassword);
       const { importWallet } = await import("~/lib/utils/wallet-utils");
-      const walletData = await importWallet(activeWallet.seedPhrase);
+      const walletData = await importWallet(decryptedSeedPhrase);
       const keypair = walletData.keypair;
       
-      // Sign the transaction with the derived keypair
       transaction.sign(keypair);
       return transaction;
     } 
     // Check if we have the private key (for private key imported wallets)
     else if (activeWallet.privateKey) {
-      // Derive the keypair from the private key
+      const decryptedPrivateKey = await decryptData(activeWallet.privateKey, signingPassword);
       const { importWallet } = await import("~/lib/utils/wallet-utils");
       try {
-        const walletData = await importWallet(activeWallet.privateKey);
+        const walletData = await importWallet(decryptedPrivateKey);
         const keypair = walletData.keypair;
         
-        // Sign the transaction with the keypair
         transaction.sign(keypair);
         return transaction;
       } catch (err) {
@@ -213,8 +231,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   // Function to manually refresh balances
   async function refreshBalances() {
-    if (!activeWallet) {
-      console.error("No active wallet available for balance refresh");
+    if (!activeWallet || isLocked) {
+      console.error("No active wallet available or wallet is locked for balance refresh");
       return;
     }
 
@@ -252,8 +270,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   // Security functions
   const setPassword = async (password: string) => {
+    console.log("WalletContext: setPassword called with password length:", password ? password.length : 0); // DEBUG
     if (!password) {
       setPasswordHash(null);
+      console.log("WalletContext: Cleared password hash, setting isLocked to false"); // DEBUG
+      setIsLocked(false);
       return true;
     }
     
@@ -292,7 +313,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
       
+      console.log("WalletContext: Setting password hash, setting isLocked to false"); // DEBUG
       setPasswordHash(hashString);
+      setIsLocked(false); // After setting a password, we're not locked (until first actual lock)
       return true;
     } catch (error) {
       console.error("Error setting password:", error);
@@ -343,8 +366,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const lockWallet = () => {
+  const lockWallet = async () => {
+    console.log("WalletContext: lockWallet called"); // DEBUG
     setIsLocked(true);
+    await deleteSession(); // Clear the session when locking
     // Set lastActiveTime when locking so we know when it was locked
     const now = Date.now();
     setLastActiveTimeState(now); // Update immediate state
@@ -352,120 +377,202 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   };
 
   const unlockWallet = async (password: string) => {
+    console.log("WalletContext: unlockWallet called"); // DEBUG
     setIsUnlocking(true); // Prevent auto-lock interference during unlock
     
     try {
       const isValid = await verifyPassword(password);
+      console.log("WalletContext: unlockWallet - password valid:", isValid); // DEBUG
       if (isValid) {
+        // Create a new session with the password and current auto-lock timer
+        await createSession(password, autoLockTimer);
+        console.log("WalletContext: unlockWallet - session created, setting locked to false"); // DEBUG
         setIsLocked(false);
         setLastActiveTimeState(null); // Update immediate state
         setLastActiveTimeStorage(null); // Update persistent storage
+        
+        // Update session last active time periodically
+        updateSessionLastActive();
+        
         return true;
       }
       return false;
     } finally {
-      setIsUnlocking(false); // Always clear the flag
+      // Small delay to ensure state is properly updated before clearing flag
+      setTimeout(() => {
+        console.log("WalletContext: unlockWallet - clearing unlock flag"); // DEBUG
+        setIsUnlocking(false); // Always clear the flag
+      }, 100);
     }
   };
 
-  const checkAutoLock = () => {
-    if (!passwordHash) return; // No password set
-    if (isLocked) return; // Already locked
-    if (isUnlocking) return; // Don't auto-lock during unlock
-    
-    const now = Date.now();
-    const lastActive = lastActiveTime;
-    
-    // If lastActiveTime is null, user is actively using the wallet (just unlocked)
-    if (lastActive === null) {
-      return;
-    }
-    
-    const timeDiff = now - lastActive;
-    let lockTime = 0;
-    
-    switch (autoLockTimer) {
-      case "immediately": 
-        // Small grace period to allow popup close to be detected
-        lockTime = 1000; // 1 second
-        break;
-      case "10mins": 
-        lockTime = 10 * 60 * 1000; 
-        break;
-      case "30mins": 
-        lockTime = 30 * 60 * 1000; 
-        break;
-      case "1hr": 
-        lockTime = 60 * 60 * 1000; 
-        break;
-      case "4hrs": 
-        lockTime = 4 * 60 * 60 * 1000; 
-        break;
-      default: 
-        lockTime = 1000;
-    }
-    
-    if (timeDiff >= lockTime) {
-      lockWallet();
-    }
-  };
-
-  // Track popup visibility to detect when user closes the extension
+  // Check session expiration periodically instead of using the old auto-lock mechanism
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Only set lastActiveTime if we're in an active session (not already set)
-        if (lastActiveTime === null && !isLocked && !isUnlocking && passwordHash) {
-          const now = Date.now();
-          setLastActiveTimeState(now); // Update immediate state
-          setLastActiveTimeStorage(now); // Update persistent storage
+    const checkSession = async () => {
+      console.log("WalletContext: Periodic session check - passwordHash:", !!passwordHash, "isLocked:", isLocked, "isUnlocking:", isUnlocking, "wallets length:", wallets.length); // DEBUG
+      // Don't check session expiration if no password is set, wallet is locked, 
+      // currently unlocking, or no wallets exist (still onboarding)
+      if (!passwordHash || isLocked || isUnlocking || wallets.length === 0) return;
+      
+      try {
+        const isExpired = await isSessionExpired();
+        console.log("WalletContext: Periodic check - isExpired:", isExpired); // DEBUG
+        if (isExpired) {
+          console.log("WalletContext: Periodic check - session expired, locking wallet"); // DEBUG
+          await lockWallet();
         }
+      } catch (error) {
+        console.error("Error checking session expiration:", error);
       }
     };
+
+    // Check session initially
+    checkSession();
+    
+    // Set up interval to check session regularly
+    const interval = setInterval(checkSession, 5000); // Check every 5 seconds
+    return () => clearInterval(interval);
+  }, [passwordHash, isLocked, isUnlocking, wallets.length]);
+
+  // Check for existing session on mount and setup visibility tracking
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      console.log("WalletContext: checkExistingSession - passwordHash:", passwordHash, "wallets length:", wallets?.length); // DEBUG
+      if (passwordHash) {
+        // If there are no wallets, user is still in onboarding process - keep unlocked
+        if (wallets?.length === 0) {
+          console.log("WalletContext: Password set but no wallets exist, keeping unlocked (still onboarding)"); // DEBUG
+          setIsLocked(false);
+        } else {
+          // Wallets exist, check for session
+          const session = await getSession();
+          console.log("WalletContext: checkExistingSession - session exists:", !!session); // DEBUG
+          if (session) {
+            // Check if the session is expired
+            const isExpired = await isSessionExpired();
+            console.log("WalletContext: checkExistingSession - isExpired:", isExpired); // DEBUG
+            if (isExpired) {
+              // Session expired, remove it and lock the wallet
+              await deleteSession();
+              console.log("WalletContext: Session expired, locking wallet"); // DEBUG
+              setIsLocked(true);
+            } else {
+              // Valid session exists, keep wallet unlocked
+              console.log("WalletContext: Valid session exists, keeping unlocked"); // DEBUG
+              setIsLocked(false);
+            }
+          } else {
+            // No session exists but wallets exist, wallet should be locked
+            console.log("WalletContext: No session exists, setting locked (wallets exist but no active session)"); // DEBUG
+            setIsLocked(true);
+          }
+        }
+      } else {
+        // No password set, wallet is not locked (no need to lock)
+        console.log("WalletContext: No passwordHash, keeping unlocked (new user setup)"); // DEBUG
+        setIsLocked(false);
+      }
+    };
+
+    // Use a small delay to ensure other initializations complete first
+    setTimeout(() => {
+      checkExistingSession();
+    }, 100);
+  }, [passwordHash, wallets?.length]);
+
+  // Track popup visibility and update session activity
+  useEffect(() => {
+    let activityInterval: NodeJS.Timeout | null = null;
+
+    // Calculate interval based on autoLockTimer to ensure session doesn't expire
+    // Set interval to be half of the auto-lock time, with minimum of 5 seconds and maximum of 30 seconds
+    const getIntervalTime = () => {
+      switch (autoLockTimer) {
+        case "immediately": 
+          return 500; // Update every 0.5 seconds for "immediately" setting
+        case "10mins": 
+          return 30000; // Update every 30 seconds (reasonable for 10 min timer)
+        case "30mins": 
+          return 60000; // Update every minute
+        case "1hr": 
+          return 120000; // Update every 2 minutes
+        case "4hrs": 
+          return 300000; // Update every 5 minutes
+        default: 
+          return 500; // Default to 0.5 seconds
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      console.log("WalletContext: Visibility change - hidden:", document.hidden, "isLocked:", isLocked, "passwordHash exists:", !!passwordHash); // DEBUG
+      if (document.hidden) {
+        // When the popup is hidden, update the session last active time to current
+        updateSessionLastActive();
+        
+        // Clear the activity interval when popup is hidden
+        if (activityInterval) {
+          clearInterval(activityInterval);
+          activityInterval = null;
+        }
+      } else {
+        // When the popup is shown again, check if we need to lock
+        setTimeout(async () => {
+          console.log("WalletContext: Popup shown - checking session, isLocked:", isLocked, "passwordHash:", !!passwordHash); // DEBUG
+          if (!isLocked && passwordHash) {
+            const isExpired = await isSessionExpired();
+            console.log("WalletContext: Session check - isExpired:", isExpired); // DEBUG
+            if (isExpired) {
+              console.log("WalletContext: Session expired, locking wallet"); // DEBUG
+              await lockWallet();
+            } else {
+              // Update last active time when popup is shown
+              console.log("WalletContext: Session valid, updating last active time and starting activity interval"); // DEBUG
+              updateSessionLastActive();
+              
+              // Restart the activity interval with appropriate timing when popup is shown
+              if (!activityInterval) {
+                const intervalTime = getIntervalTime();
+                activityInterval = setInterval(() => {
+                  updateSessionLastActive();
+                }, intervalTime);
+              }
+            }
+          }
+        }, 100); // Small delay to ensure state is updated
+      }
+    };
+
+    // Set up the activity interval when the component mounts and wallet is unlocked
+    if (!isLocked && passwordHash) {
+      const intervalTime = getIntervalTime();
+      activityInterval = setInterval(() => {
+        updateSessionLastActive();
+      }, intervalTime);
+    }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (activityInterval) {
+        clearInterval(activityInterval);
+      }
     };
-  }, [lastActiveTime, isLocked, isUnlocking, passwordHash]);
-
-  // Check for auto-lock on mount (when extension reopens)
-  useEffect(() => {
-    if (passwordHash && lastActiveTimeStorage !== null) {
-      const now = Date.now();
-      const timeDiff = now - lastActiveTimeStorage;
-      
-      let lockTime = 0;
-      switch (autoLockTimer) {
-        case "immediately": lockTime = 1000; break;
-        case "10mins": lockTime = 10 * 60 * 1000; break;
-        case "30mins": lockTime = 30 * 60 * 1000; break;
-        case "1hr": lockTime = 60 * 60 * 1000; break;
-        case "4hrs": lockTime = 4 * 60 * 60 * 1000; break;
-        default: lockTime = 1000;
-      }
-      
-      if (timeDiff >= lockTime) {
-        setIsLocked(true);
-      }
-    }
-  }, []); // Only run on initial mount
-
-  // Periodic auto-lock checking
-  useEffect(() => {
-    checkAutoLock();
-    
-    const interval = setInterval(checkAutoLock, 5000); // Check every 5 seconds
-    return () => clearInterval(interval);
-  }, [passwordHash, autoLockTimer, isLocked, isUnlocking]); // Removed lastActiveTime to prevent re-triggering
+  }, [isLocked, passwordHash, autoLockTimer]);
 
   useEffect(() => {
     setLoading(true);
     if (activeWalletId) {
       const foundWallet = wallets.find((w) => w.id === activeWalletId);
+      console.log("WalletContext: Found wallet by ID", foundWallet ? foundWallet.id : "null"); // DEBUG
       setActiveWalletState(foundWallet || null);
+    } else if (wallets && wallets.length > 0) {
+      // If no active wallet is set, default to the first one
+      console.log("WalletContext: No active wallet ID, defaulting to first wallet in array", wallets[0]?.id); // DEBUG
+      setActiveWalletState(wallets[0]);
+      setActiveWalletId(wallets[0].id);
     } else {
+      console.log("WalletContext: No wallets found, setting active wallet to null"); // DEBUG
       setActiveWalletState(null);
     }
     setLoading(false);
@@ -598,11 +705,24 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     setActiveWalletId(wallet ? wallet.id : null);
   };
 
-  const addWallet = (wallet: Wallet, setActive: boolean = true) => {
+  const addWallet = async (wallet: Wallet, password: string, setActive: boolean = true) => {
+    if (!password) {
+      throw new Error("Password is required to add a wallet");
+    }
+
+    const encryptedWallet = { ...wallet };
+
+    if (wallet.seedPhrase) {
+      encryptedWallet.seedPhrase = await encryptData(wallet.seedPhrase, password);
+    }
+    if (wallet.privateKey) {
+      encryptedWallet.privateKey = await encryptData(wallet.privateKey, password);
+    }
+
     setWallets((prevWallets) => {
-      const updatedWallets = [...prevWallets, wallet];
+      const updatedWallets = [...prevWallets, encryptedWallet];
       if (setActive) {
-        setActiveWalletId(wallet.id);
+        setActiveWalletId(encryptedWallet.id);
       }
       return updatedWallets;
     });
@@ -662,10 +782,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         tokens: isLocked ? [] : tokens,
         preferredCurrency,
         setPreferredCurrency,
-        signTransaction: isLocked ? async () => { throw new Error("Wallet is locked"); } : signTransaction,
+        signTransaction: isLocked 
+          ? async (transaction: any, password?: string) => { throw new Error("Wallet is locked"); } 
+          : signTransaction,
         getTransactionHistory: isLocked ? async () => [] : getTransactionHistory,
         clearTransactionHistoryCache,
-        refreshBalances,
+        refreshBalances: isLocked ? async () => {} : refreshBalances,
         // Security functions
         passwordHash,
         setPassword,

@@ -40,3 +40,9 @@ accent-color.txt
 
 # env
 .env
+
+# Tooling
+/gorbag-adapter
+
+# Integration
+/test-dapp

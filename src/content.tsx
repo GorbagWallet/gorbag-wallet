@@ -1,49 +1,79 @@
-import cssText from "data-text:~style.css"
-import type { PlasmoCSConfig } from "plasmo"
-
-import { CountButton } from "~features/count-button"
-
-export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"]
-}
-
 /**
- * Generates a style element with adjusted CSS to work correctly within a Shadow DOM.
- *
- * Tailwind CSS relies on `rem` units, which are based on the root font size (typically defined on the <html>
- * or <body> element). However, in a Shadow DOM (as used by Plasmo), there is no native root element, so the
- * rem values would reference the actual page's root font size—often leading to sizing inconsistencies.
- *
- * To address this, we:
- * 1. Replace the `:root` selector with `:host(plasmo-csui)` to properly scope the styles within the Shadow DOM.
- * 2. Convert all `rem` units to pixel values using a fixed base font size, ensuring consistent styling
- *    regardless of the host page's font size.
+ * This content script is the bridge between the main world script (`inject.ts`)
+ * and the extension's background service worker.
+ * 
+ * It has no direct access to the page's `window` object, but it can pass messages
+ * to and from the `inject.ts` script, which does.
  */
-export const getStyle = (): HTMLStyleElement => {
-  const baseFontSize = 16
+import type { PlasmoCSConfig } from "plasmo";
 
-  let updatedCssText = cssText.replaceAll(":root", ":host(plasmo-csui)")
-  const remRegex = /([\d.]+)rem/g
-  updatedCssText = updatedCssText.replace(remRegex, (match, remValue) => {
-    const pixelsValue = parseFloat(remValue) * baseFontSize
+// Configures the content script to run at document_start.
+export const config: PlasmoCSConfig = {
+  matches: ["<all_urls>"],
+  run_at: "document_start",
+  all_frames: true, // Required to communicate with iframes
+};
 
-    return `${pixelsValue}px`
-  })
+// --- Message Bridge ---
 
-  const styleElement = document.createElement("style")
+// 1. Listen for requests from the injected script (dApp -> provider -> content script).
+window.addEventListener("message", (event) => {
+  if (
+    event.source === window &&
+    event.data?.source === "gorbag-injected-script-request"
+  ) {
+    const { id, method, params } = event.data;
 
-  styleElement.textContent = updatedCssText
+    // Forward the request to the background script for processing.
+    chrome.runtime
+      .sendMessage({
+        source: "gorbag-content-script",
+        method,
+        params,
+      })
+      .then((response) => {
+        // Success: Send the response back to the injected script.
+        window.postMessage(
+          {
+            source: "gorbag-extension-response",
+            id: id,
+            result: response,
+          },
+          window.location.origin
+        );
+      })
+      .catch((error) => {
+        // Error: Send a structured error back to the injected script.
+        window.postMessage(
+          {
+            source: "gorbag-extension-response",
+            id: id,
+            error: { message: error.message },
+          },
+          window.location.origin
+        );
+      });
+  }
+});
 
-  return styleElement
+// 2. Listen for events pushed from the background script (e.g., account changes).
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.source === "gorbag-background-event") {
+    // Forward the event to the injected script.
+    window.postMessage(
+      {
+        source: "gorbag-extension-response", // Use the same source for simplicity.
+        eventName: message.eventName,
+        eventParams: message.eventParams,
+      },
+      window.location.origin
+    );
+  }
+  // Return true to indicate you wish to send a response asynchronously.
+  return true;
+});
+
+// This content script is for logic only; no UI is rendered.
+export default function Content() {
+  return null;
 }
-
-const PlasmoOverlay = () => {
-  return (
-    <div className="plasmo-z-50 plasmo-flex plasmo-fixed plasmo-top-32 plasmo-right-8">
-      {/* <p>8</p> */}
-      <CountButton />
-    </div>
-  )
-}
-
-export default PlasmoOverlay

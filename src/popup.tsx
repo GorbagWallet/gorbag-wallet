@@ -20,6 +20,8 @@ import NftPage from "~/features/dashboard/nft-page"
 import { WalletLockScreen } from "~/components/wallet-lock-screen"
 import TokenPage from "~/features/dashboard/token-page"
 import { BannerSection } from "~/features/dashboard/banner-section"
+import { DappConnectionProvider, useDappConnection } from "~/features/dapp-connection/context"
+import { DappConnectionModal } from "~/features/dapp-connection/dapp-connection-modal"
 
 import "~style.css"
 
@@ -53,12 +55,13 @@ function DashboardPage({ onNavigate, onRefresh, view }: { onNavigate: (view: str
 }
 
 const App = () => {
-  const { activeWallet, loading, refreshBalances } = useWallet()
+  const { activeWallet, loading, refreshBalances, isLocked } = useWallet()
   const [view, setView] = useState<
     "loading" | "onboarding" | "dashboard" | "walletManagement" | "activity" | "settings" | "swap" | "nft" | "token"
   >("loading")
   const [selectedWalletId, setSelectedWalletId] = useState<string | undefined>(undefined)
   const [selectedTokenSymbol, setSelectedTokenSymbol] = useState<string | undefined>(undefined)
+  const [isDuringOnboarding, setIsDuringOnboarding] = useState(false) // Track if we're in the middle of onboarding
 
   const handleNavigate = (newView: string, walletId?: string, shouldRefresh?: boolean, tokenSymbol?: string) => {
     setSelectedWalletId(walletId)
@@ -69,22 +72,72 @@ const App = () => {
     }
   }
 
+  // Detect when onboarding starts (but not when just showing lock screen)
   useEffect(() => {
+    if (view === "onboarding" && isLocked === false) {
+      // Only set onboarding state if we're in onboarding view but not locked
+      // This means we're actually in an onboarding flow, not just showing lock screen
+      setIsDuringOnboarding(true);
+      console.log("App: Onboarding started, setting isDuringOnboarding to true"); // DEBUG
+    } else if (view !== "onboarding") {
+      // If we're not in onboarding view, ensure onboarding flag is false
+      setIsDuringOnboarding(false);
+      console.log("App: Not in onboarding view, setting isDuringOnboarding to false"); // DEBUG
+    }
+  }, [view, isLocked]);
+
+  useEffect(() => {
+    console.log("App useEffect: activeWallet", activeWallet ? activeWallet.id : null, "loading", loading, "view", view, "isDuringOnboarding", isDuringOnboarding, "isLocked", isLocked); // DEBUG
+    
+    // Don't change view automatically if we're in the middle of onboarding
+    if (isDuringOnboarding) {
+      console.log("App: During onboarding, skipping automatic view change"); // DEBUG
+      return;
+    }
+    
     if (loading) {
+      console.log("App: Loading, setting view to loading"); // DEBUG
       setView("loading")
+    } else if (isLocked) {
+      console.log("App: Wallet is locked, keeping onboarding view (lock screen will overlay)"); // DEBUG
+      // Wallet is locked, show onboarding view so lock screen appears
+      if (view !== "loading") {
+        setView("onboarding"); // Show onboarding view as default when locked, regardless of active wallet
+      }
     } else if (activeWallet === null) {
+      console.log("App: No active wallet, setting view to onboarding"); // DEBUG
       setView("onboarding")
     } else {
+      console.log("App: Active wallet exists and not locked, setting view to dashboard"); // DEBUG
       setView("dashboard")
     }
-  }, [activeWallet, loading])
+  }, [activeWallet, loading, isDuringOnboarding, isLocked]) // Removed view from dependency to prevent conflicts with manual navigation
+
+  // Reset onboarding flag when leaving onboarding or when wallet is unlocked after onboarding
+  useEffect(() => {
+    if (view !== "onboarding" && isDuringOnboarding) {
+      console.log("App: Leaving onboarding, setting isDuringOnboarding to false"); // DEBUG
+      setIsDuringOnboarding(false);
+    }
+  }, [view, isDuringOnboarding]);
+
+  // Also reset onboarding flag when wallet is unlocked if not in onboarding view
+  useEffect(() => {
+    if (isLocked === false && view !== "onboarding" && isDuringOnboarding) {
+      console.log("App: Wallet unlocked and not in onboarding view, setting isDuringOnboarding to false"); // DEBUG
+      setIsDuringOnboarding(false);
+    }
+  }, [isLocked, view, isDuringOnboarding]);
 
   const renderView = () => {
     switch (view) {
       case "loading":
         return <DashboardPage onNavigate={handleNavigate} view={view} />;
       case "onboarding":
-        return <Onboarding onDashboard={() => handleNavigate("dashboard") } />;
+        return <Onboarding onDashboard={() => {
+          setIsDuringOnboarding(false); // Mark onboarding as completed
+          handleNavigate("dashboard");
+        }} />;
       case "dashboard":
         return <DashboardPage onNavigate={handleNavigate} onRefresh={refreshBalances} view={view} />;
       case "walletManagement":
@@ -115,15 +168,32 @@ const App = () => {
   );
 }
 
+const AppWithDappConnection = () => {
+  const { pendingRequest, approveConnection, rejectConnection } = useDappConnection();
+  
+  return (
+    <>
+      <App />
+      <DappConnectionModal 
+        isOpen={!!pendingRequest}
+        request={pendingRequest}
+        onApprove={approveConnection}
+        onReject={rejectConnection}
+      />
+    </>
+  );
+}
+
 const IndexPopup = () => {
   return (
     <I18nProvider>
-      <WalletProvider>
-        <App />
-      </WalletProvider>
+      <DappConnectionProvider>
+        <WalletProvider>
+          <AppWithDappConnection />
+        </WalletProvider>
+      </DappConnectionProvider>
     </I18nProvider>
   )
 }
 
 export default IndexPopup
-

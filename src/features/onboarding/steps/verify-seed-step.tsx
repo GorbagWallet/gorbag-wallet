@@ -25,14 +25,19 @@ export function VerifySeedStep({ seedPhrase, onVerified, onBack }: VerifySeedSte
   }, []);
 
   const handleVerify = () => {
+    console.log("VerifySeedStep: handleVerify called, answers:", answers, "seedPhrase:", seedPhrase); // DEBUG
     const allCorrect = indices.every((idx) => answers[idx]?.toLowerCase() === seedPhrase[idx].toLowerCase());
+    console.log("VerifySeedStep: allCorrect?", allCorrect); // DEBUG
 
     if (allCorrect) {
+      console.log("Seed phrase verified correctly, calling onVerified()"); // DEBUG
       onVerified();
     } else {
       const newVerified: Record<number, boolean> = {};
       indices.forEach((idx) => {
-        newVerified[idx] = answers[idx]?.toLowerCase() === seedPhrase[idx].toLowerCase();
+        const isCorrect = answers[idx]?.toLowerCase() === seedPhrase[idx].toLowerCase();
+        console.log(`VerifySeedStep: Word ${idx + 1} correct?`, isCorrect, "user answer:", answers[idx], "expected:", seedPhrase[idx]); // DEBUG
+        newVerified[idx] = isCorrect;
       });
       setVerified(newVerified);
     }

@@ -13,7 +13,7 @@ interface PostOnboardingProps {
 
 export function PostOnboarding({ nickname, onComplete }: PostOnboardingProps) {
   const { t } = useI18n();
-  const { activeWallet } = useWallet();
+  const { activeWallet, setActiveWallet, wallets, unlockWallet } = useWallet();
   const [isTakeTourAnimating, setTakeTourAnimating] = useState(false);
   const [isSkipAnimating, setSkipAnimating] = useState(false);
   const [showTour, setShowTour] = useState(false); // New state
@@ -26,16 +26,33 @@ export function PostOnboarding({ nickname, onComplete }: PostOnboardingProps) {
     }, 300);
   };
 
-  const handleSkipClick = () => {
+  const handleSkipClick = async () => {
     setSkipAnimating(true);
-    setTimeout(() => {
+    setTimeout(async () => {
       setSkipAnimating(false);
+      // Set the most recently added wallet as active
+      const lastWallet = wallets[wallets.length - 1];
+      if (lastWallet) {
+        setActiveWallet(lastWallet);
+      }
+      // Complete onboarding first to navigate to dashboard
       onComplete();
     }, 300);
   };
 
+  // Handle tour completion with session creation
+  const handleTourComplete = async () => {
+    // Set the most recently added wallet as active
+    const lastWallet = wallets[wallets.length - 1];
+    if (lastWallet) {
+      setActiveWallet(lastWallet);
+    }
+    // Complete onboarding to navigate to dashboard
+    onComplete();
+  };
+
   if (showTour) {
-    return <OnboardingTour onComplete={onComplete} />; // Render OnboardingTour if showTour is true
+    return <OnboardingTour onComplete={handleTourComplete} />; // Pass the updated complete function
   }
 
   return (
