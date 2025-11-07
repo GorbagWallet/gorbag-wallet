@@ -115,12 +115,16 @@ The test suite covers the following areas:
 - **Currency & Token Services**: Token value calculations, portfolio management, and API fallback mechanisms
 - **Wallet Configuration**: Network configurations, token data structures, and constants
 - **Token Utilities**: Token amount formatting, value conversion, and utility functions  
-- **Security Features**: Wallet data structures and security-related configurations
+- **Security Features**: Wallet data structures, security-related configurations, and encryption utilities
 - **API Integration**: Mocked external API calls with proper fallback handling
+- **Wallet Session Management**: Session lifecycle, expiration handling, and security features
+- **Solana/Solana Interactions**: Balance fetching, transaction history, and token operations
+- **Swap Service Logic**: Swap quoting, transaction execution, and integration with Jupiter
+- **Wallet Utilities**: Seed phrase generation, validation, wallet import, and address validation
 
-All tests focus on core business logic rather than UI components, ensuring the wallet's critical functions work reliably. The test suite includes 44 tests across 5 test suites, providing comprehensive coverage of the wallet's core functionality.
+All tests focus on core business logic rather than UI components, ensuring the wallet's critical functions work reliably. The test suite includes 127 tests across 11 test suites, providing comprehensive coverage of the wallet's core functionality.
 
-Based on the coverage report, the tests provide significant coverage of the core logic files (especially `currency.ts` at ~74% coverage) while intentionally leaving UI components untested to focus on critical business logic. The overall project coverage is approximately 5%, which reflects the focus on core services rather than UI components.
+Based on the coverage report, the tests now provide excellent coverage of the core logic files, with particular strength in security features, wallet utilities, and currency services. The test suite focuses on critical business logic while intentionally leaving UI components untested to maximize effectiveness of testing resources.
 
 ### Contributing
 

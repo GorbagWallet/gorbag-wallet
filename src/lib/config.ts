@@ -5,7 +5,7 @@ export const networks = {
     network: "testnet",
   },
   solana: {
-    rpc: "https://mainnet.helius-rpc.com/?api-key=3b3d8e0c-c07a-47db-a270-eb14f7f3ac34",
+    rpc: `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY || ''},
     explorer: "https://solscan.io/tx/", // Using a consistent format
     network: "mainnet-beta",
   },

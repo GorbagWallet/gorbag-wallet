@@ -168,7 +168,19 @@ export function parseTransactionForActivity(
 
   const defaultTokenSymbol = network === "gorbagana" ? "GOR" : "SOL";
   const fee = transaction.meta.fee || 0;
-  const message = transaction.transaction.message;
+  const message = transaction.transaction?.message;
+  
+  // Check if message exists before proceeding
+  if (!message || !message.accountKeys) {
+    // Ultimate fallback
+    return {
+      type: "unknown",
+      tokenSymbol: defaultTokenSymbol,
+      amount: "0.00",
+      counterparty: "Unknown",
+      fee: fee
+    };
+  }
   
   // Get account keys from both parsed and unparsed formats
   const accountKeys = message.accountKeys.map((key: any) => {
@@ -336,7 +348,7 @@ export function parseTransactionForActivity(
   }
 
   // Fallback: parse instructions manually
-  const instructions = message.instructions;
+  const instructions = message.instructions || [];
   
   for (const instruction of instructions) {
     try {

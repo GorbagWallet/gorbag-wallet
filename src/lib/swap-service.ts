@@ -138,9 +138,37 @@ export class SwapService {
   }
 
   async executeSwap(request: SwapExecutionRequest, signTransaction: (transaction: any) => Promise<any>): Promise<string> {
-    const { quoteResponse, userPublicKey } = request;
+    const { quoteResponse: inputQuoteResponse, userPublicKey } = request;
 
     try {
+      if (!this.connection) {
+        throw new Error("Connection not initialized");
+      }
+
+      // Get the swap transaction from Jupiter API
+      const swapApiCall = await fetch('https://quote-api.jup.ag/v6/swap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quoteResponse: inputQuoteResponse,
+          userPublicKey: userPublicKey.toString(),
+          wrapAndUnwrapSol: true, // Auto wrap/unwrap SOL
+        })
+      }).then(res => res.json());
+      
+      const { swapTransaction } = swapApiCall;
+
+      if (!swapTransaction) {
+        throw new Error("No swap transaction received from Jupiter API");
+      }
+
+      // Deserialize the transaction
+      const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
+      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+
+      // Sign the transaction with the user's wallet
+      const signedTransaction = await signTransaction(transaction);
+
       // Get the swap transaction from Jupiter API
       const { swapTransaction } = await fetch('https://quote-api.jup.ag/v6/swap', {
         method: 'POST',
@@ -154,17 +182,6 @@ export class SwapService {
 
       if (!swapTransaction) {
         throw new Error("No swap transaction received from Jupiter API");
-      }
-
-      // Deserialize the transaction
-      const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
-      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-
-      // Sign the transaction with the user's wallet
-      const signedTransaction = await signTransaction(transaction);
-
-      if (!this.connection) {
-        throw new Error("Connection not initialized");
       }
 
       // Send the transaction
