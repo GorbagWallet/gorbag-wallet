@@ -21,6 +21,17 @@ interface PendingRequest {
 }
 let pendingConnection: PendingRequest | null = null;
 
+// Add this interface at the top with other interfaces
+interface PendingTransaction {
+  sendResponse: (response: any) => void;
+  transaction: any;
+  dAppMetadata: any;
+  walletAddress: string; // Address of wallet that needs to sign
+}
+
+// Add this variable with other pending request variables
+let pendingTransaction: PendingTransaction | null = null;
+
 async function getActiveWalletFromStorage(): Promise<Wallet | null> {
   try {
     const result = await chrome.storage.local.get(["gorbag_active_wallet", "gorbag_wallets"]);
@@ -92,6 +103,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Handle messages asynchronously if needed
   (async () => {
     switch (method) {
+      case "signTransaction":
+        // Check if there's already a pending transaction
+        if (pendingTransaction) {
+          sendResponse({ error: "A transaction signing request is already pending." });
+          return;
+        }
+
+        // Validate transaction data
+        if (!params.transaction || !params.dAppMetadata) {
+          sendResponse({ error: "Invalid transaction signing request." });
+          return;
+        }
+
+        // Get active wallet to verify it exists
+        const activeWallet = await getActiveWalletFromStorage();
+        if (!activeWallet) {
+          sendResponse({ error: "No active wallet available for signing." });
+          return;
+        }
+
+        // Store the transaction request details
+        pendingTransaction = {
+          sendResponse,
+          transaction: params.transaction,
+          dAppMetadata: {
+            ...params.dAppMetadata,
+            origin: sender.origin // Use sender.origin for security
+          },
+          walletAddress: activeWallet.address
+        };
+
+        // Open the confirmation popup for transaction signing
+        await openConfirmationWindow();
+        // Don't send response here - it will be sent when user approves/rejects in the popup
+        return;
+
       case "connect":
         // If a request is already pending, reject the new one.
         if (pendingConnection) {
@@ -133,19 +180,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse(pendingConnection?.data || null);
         return;
 
-      case "resolve-pending-connection":
-        if (pendingConnection) {
-          const { approved } = params;
-          const resolvedActiveWallet = await getActiveWalletFromStorage(); // Get active wallet here
+      case "get-pending-transaction":
+        sendResponse(pendingTransaction || null);
+        return;
 
-          if (approved && resolvedActiveWallet) {
-            pendingConnection.sendResponse({ publicKey: resolvedActiveWallet.address });
+      case "resolve-pending-request":
+        console.log("[background.ts] resolve-pending-request: received", params);
+        const { type, approved, signedTransaction } = params;
+
+        if (type === "transaction" && pendingTransaction) {
+          if (approved) {
+            pendingTransaction.sendResponse({ signedTransaction });
           } else {
-            pendingConnection.sendResponse({ error: "Connection request was rejected by the user." });
+            pendingTransaction.sendResponse({ error: "Transaction signing was rejected." });
           }
-          pendingConnection = null; // Clear the request
+          pendingTransaction = null; // Clear the pending transaction
+        } else if (type === "connection" && pendingConnection) {
+            const resolvedActiveWallet = await getActiveWalletFromStorage();
+  
+            if (approved && resolvedActiveWallet) {
+              pendingConnection.sendResponse({ publicKey: resolvedActiveWallet.address });
+            } else {
+              pendingConnection.sendResponse({ error: "Connection request was rejected by the user." });
+            }
+            pendingConnection = null; // Clear the request
         }
-        sendResponse(true); // Acknowledge resolution
+        sendResponse(true);
         return;
 
       default:

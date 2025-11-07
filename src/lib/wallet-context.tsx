@@ -95,13 +95,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [rawTokens, setRawTokens] = useState<any[]>([]);
   const [tokens, setTokens] = useState<any[]>([]);
 
+  
+
   // Add signing functionality that works for both seed phrase and private key imported wallets
-  async function signTransaction(transaction: any, password: string): Promise<any> {
+  async function signTransaction(transaction: any, password?: string): Promise<any> {
     if (!activeWallet) {
       throw new Error("No active wallet available for signing");
     }
 
-    // If a password is provided, use it directly
     // If no password is provided, try to get it from the current session
     let signingPassword = password || "";
     if (!signingPassword) {
@@ -115,15 +116,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Password is required for signing");
     }
 
-    // Check if we have the seed phrase (for created wallets or seed phrase imported wallets)
+    // Helper function to determine if transaction is versioned - moved to be accessible by all branches
+    const isVersionedTransaction = (tx: any): boolean => {
+      return 'version' in tx;
+    };
+
+    let keypair: any;
+
+    // Get the keypair based on wallet type
     if (activeWallet.seedPhrase && activeWallet.seedPhrase.length > 0) {
       const decryptedSeedPhrase = await decryptData(activeWallet.seedPhrase, signingPassword);
       const { importWallet } = await import("~/lib/utils/wallet-utils");
       const walletData = await importWallet(decryptedSeedPhrase);
-      const keypair = walletData.keypair;
-      
-      transaction.sign(keypair);
-      return transaction;
+      keypair = walletData.keypair;
     } 
     // Check if we have the private key (for private key imported wallets)
     else if (activeWallet.privateKey) {
@@ -131,17 +136,23 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const { importWallet } = await import("~/lib/utils/wallet-utils");
       try {
         const walletData = await importWallet(decryptedPrivateKey);
-        const keypair = walletData.keypair;
-        
-        transaction.sign(keypair);
-        return transaction;
+        keypair = walletData.keypair;
       } catch (err) {
-        console.error("Error signing with private key:", err);
+        console.error("Error getting private key for signing:", err);
         throw new Error("Error signing transaction with private key");
       }
     } else {
       throw new Error("No seed phrase or private key available for signing");
     }
+
+    // Perform the signing with the obtained keypair
+    if (isVersionedTransaction(transaction)) {
+      transaction.sign([keypair]);
+    } else {
+      transaction.partialSign(keypair);
+    }
+    
+    return transaction;
   }
 
   // Cache for transaction history

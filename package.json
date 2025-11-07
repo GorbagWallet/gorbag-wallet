@@ -12,7 +12,7 @@
     "firefox-build": "plasmo build --target=firefox-mv2",
     "chrome-build": "plasmo build --target=chrome-mv3",
     "xpi-build": "cd build/firefox-mv2-prod && web-ext build",
-    "xpi-sign": "source .env && echo 'remember to add the $FIREFOX_API_KEY and $FIREFOX_API_SECRET envs' && cd build/firefox-mv2-prod && web-ext sign --api-key=$FIREFOX_API_KEY --api-secret=$FIREFOX_API_SECRET",
+    "xpi-sign": ". ./.env && echo 'remember to add the $FIREFOX_API_KEY and $FIREFOX_API_SECRET envs' && cd build/firefox-mv2-prod && web-ext sign --api-key=$FIREFOX_API_KEY --api-secret=$FIREFOX_API_SECRET --channel=unlisted",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"

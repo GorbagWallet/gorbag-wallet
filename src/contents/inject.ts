@@ -209,17 +209,31 @@ class GorbagWalletProvider extends SimpleEventEmitter {
   ): Promise<T> {
     if (!this.connected || !this.publicKey) throw new Error("Not connected");
 
-    const serialized = transaction.serialize();
+    console.log("[inject.ts] signTransaction: transaction received from dApp", transaction);
+
+    const serialized = transaction.serialize({ requireAllSignatures: false, verifySignatures: false });
+    const txString = Buffer.from(serialized).toString("base64");
+    console.log("[inject.ts] signTransaction: serialized transaction", txString);
+
     const result = await this._requestFromExtension("signTransaction", {
-      transaction: Buffer.from(serialized).toString("base64"),
+      transaction: txString,
+      dAppMetadata: {
+        name: document.title,
+        origin: window.location.origin,
+        icon: `https://www.google.com/s2/favicons?domain=${window.location.hostname}`
+      }
     });
 
+    console.log("[inject.ts] signTransaction: result from background", result);
+
     const signedTxBuffer = Buffer.from(result.signedTransaction, "base64");
-    return (
-      isVersionedTransaction(transaction)
+    const signedTx = isVersionedTransaction(transaction)
         ? VersionedTransaction.deserialize(signedTxBuffer)
-        : Transaction.from(signedTxBuffer)
-    ) as T;
+        : Transaction.from(signedTxBuffer);
+
+    console.log("[inject.ts] signTransaction: deserialized signed transaction", signedTx);
+
+    return signedTx as T;
   }
 
   async signAllTransactions<T extends Transaction | VersionedTransaction>(
@@ -338,9 +352,11 @@ else {
     configurable: true,
   });
 
-  // Define a Gorbag-specific alias
+  // Define a Gorbag-specific alias with the expected structure for wallet adapter
   Object.defineProperty(window, "gorbag", {
-    value: gorbagWallet,
+    value: {
+      solana: gorbagWallet,  // Match the expected structure for wallet adapter
+    },
     writable: false,
     configurable: true,
   });
