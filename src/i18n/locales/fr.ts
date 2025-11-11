@@ -166,7 +166,15 @@ export const fr = {
     en: "Anglais",
     da: "Danois",
     fr: "Français",
-    es: "Espagnol"
+    es: "Espagnol",
+    de: "Allemand",
+    ja: "Japonais",
+    ko: "Coréen",
+    "pt-BR": "Portugais (Brésil)",
+    ru: "Russe",
+    th: "Thaï",
+    vi: "Vietnamien",
+    "zh-CN": "Chinois (simplifié)"
   },
   onboarding: {
     createWallet: "Créer un nouveau portefeuille",

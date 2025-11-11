@@ -166,7 +166,15 @@ export const en = {
     en: "English",
     da: "Danish",
     fr: "French",
-    es: "Spanish"
+    es: "Spanish",
+    de: "German",
+    ja: "Japanese",
+    ko: "Korean",
+    "pt-BR": "Portuguese (Brazil)",
+    ru: "Russian",
+    th: "Thai",
+    vi: "Vietnamese",
+    "zh-CN": "Chinese (Simplified)"
   },
   onboarding: {
     createWallet: "Create New Wallet",

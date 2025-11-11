@@ -2,9 +2,17 @@ import { en } from "./locales/en"
 import { da } from "./locales/da"  // Danish
 import { fr } from "./locales/fr"  // French
 import { es } from "./locales/es"  // Spanish (or another daughter's language)
+import { de } from "./locales/de"  // German
+import { ja } from "./locales/ja"  // Japanese
+import { ko } from "./locales/ko"  // Korean
+import { ptBR } from "./locales/pt-BR"  // Portuguese (Brazil)
+import { ru } from "./locales/ru"  // Russian
+import { th } from "./locales/th"  // Thai
+import { vi } from "./locales/vi"  // Vietnamese
+import { zhCN } from "./locales/zh-CN"  // Chinese (Simplified)
 
 // Supported languages
-export const SUPPORTED_LOCALES = ["en", "da", "fr", "es"] as const;
+export const SUPPORTED_LOCALES = ["en", "da", "fr", "es", "de", "ja", "ko", "pt-BR", "ru", "th", "vi", "zh-CN"] as const;
 export type Locale = typeof SUPPORTED_LOCALES[number];
 
 // Default language
@@ -15,7 +23,15 @@ export const translations = {
   en,
   da,
   fr,
-  es
+  es,
+  de,
+  ja,
+  ko,
+  "pt-BR": ptBR,
+  ru,
+  th,
+  vi,
+  "zh-CN": zhCN
 };
 
 // Initialize i18n

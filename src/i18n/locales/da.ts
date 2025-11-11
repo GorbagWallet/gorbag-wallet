@@ -166,7 +166,15 @@ export const da = {
     en: "Engelsk",
     da: "Dansk",
     fr: "Fransk",
-    es: "Spansk"
+    es: "Spansk",
+    de: "Tysk",
+    ja: "Japansk",
+    ko: "Koreansk",
+    "pt-BR": "Portugisisk (Brazilien)",
+    ru: "Russisk",
+    th: "Thai",
+    vi: "Vietnamesisk",
+    "zh-CN": "Kinesisk (forenklet)"
   },
   onboarding: {
     createWallet: "Opret ny tegnebog",
