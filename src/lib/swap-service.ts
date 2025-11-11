@@ -169,17 +169,8 @@ export class SwapService {
       // Sign the transaction with the user's wallet
       const signedTransaction = await signTransaction(transaction);
 
-      // Get the swap transaction from Jupiter API
-      const { swapTransaction } = await fetch('https://quote-api.jup.ag/v6/swap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quoteResponse,
-          userPublicKey: userPublicKey.toString(),
-          wrapAndUnwrapSol: true, // Auto wrap/unwrap SOL
-        })
-      }).then(res => res.json());
-
+      // The transaction has already been retrieved above, so we don't need to fetch it again
+      // Just continue with sending the transaction
       if (!swapTransaction) {
         throw new Error("No swap transaction received from Jupiter API");
       }
