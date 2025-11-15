@@ -30,6 +30,7 @@ export const ko = {
     portfolioValue: "포트폴리오 가치",
     totalBalance: "총 잔액",
     todayChange: "오늘 +{{change}}%",
+    today: "오늘",
     sendTokens: "토큰 전송",
     receiveTokens: "토큰 받기",
     hideTokens: "토큰 숨기기",

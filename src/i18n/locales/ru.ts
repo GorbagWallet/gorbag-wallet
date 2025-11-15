@@ -30,6 +30,7 @@ export const ru = {
     portfolioValue: "Стоимость портфеля",
     totalBalance: "Общий баланс",
     todayChange: "+{{change}}% сегодня",
+    today: "сегодня",
     sendTokens: "Отправить токены",
     receiveTokens: "Получить токены",
     hideTokens: "Скрыть токены",

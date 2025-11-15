@@ -27,6 +27,7 @@ interface WalletContextType {
   balance: number;
   portfolioValue: number;
   tokens: any[];
+  portfolioChange24h: number;
   preferredCurrency: string;
   setPreferredCurrency: (currency: string) => void;
   setNetwork: (network: Network) => void;
@@ -92,6 +93,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const [balance, setBalance] = useState(0);
   const [portfolioValue, setPortfolioValue] = useState(0);
+  const [portfolioChange24h, setPortfolioChange24h] = useState(0);
   const [rawTokens, setRawTokens] = useState<any[]>([]);
   const [tokens, setTokens] = useState<any[]>([]);
 
@@ -712,6 +714,55 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   }, [rawTokens, preferredCurrency]);
 
+  // Calculate portfolio change based on 24h changes of individual tokens
+  useEffect(() => {
+    const calculatePortfolioChange = async () => {
+      if (tokens.length === 0 || portfolioValue <= 0) {
+        setPortfolioChange24h(0);
+        return;
+      }
+
+      try {
+        // Import the crypto data service to get 24h changes
+        const { cryptoDataService, Network } = await import("./crypto-data-service");
+        
+        let totalWeightedChange = 0;
+        let totalValue = 0;
+
+        for (const token of tokens) {
+          const tokenValue = token.value || 0;
+          if (tokenValue <= 0) continue; // Skip tokens with no value
+
+          // Get 24h change for this token
+          const tokenDetails = await cryptoDataService.getTokenDetails(
+            token.content.metadata.symbol,
+            preferredCurrency,
+            network as Network
+          );
+
+          const priceChange24h = tokenDetails.priceChange24h || 0;
+          // Calculate weighted contribution to portfolio change
+          const weightedChange = (tokenValue / portfolioValue) * priceChange24h;
+          totalWeightedChange += weightedChange;
+          totalValue += tokenValue;
+        }
+
+        // Only use the calculated value if we have tokens with valid values
+        if (totalValue > 0) {
+          setPortfolioChange24h(totalWeightedChange);
+        } else {
+          setPortfolioChange24h(0);
+        }
+      } catch (error) {
+        console.error("Error calculating portfolio change:", error);
+        // Set to 0 if there's an error fetching token details
+        setPortfolioChange24h(0);
+      }
+    };
+
+    calculatePortfolioChange();
+  }, [tokens, portfolioValue, preferredCurrency, network]);
+
   const setActiveWallet = (wallet: Wallet | null) => {
     setActiveWalletId(wallet ? wallet.id : null);
   };
@@ -790,6 +841,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         isTokenHidden,
         balance: isLocked ? 0 : balance,
         portfolioValue: isLocked ? 0 : portfolioValue,
+        portfolioChange24h: isLocked ? 0 : portfolioChange24h,
         tokens: isLocked ? [] : tokens,
         preferredCurrency,
         setPreferredCurrency,

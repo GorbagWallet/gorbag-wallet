@@ -30,6 +30,7 @@ export const fr = {
     portfolioValue: "Valeur du portefeuille",
     totalBalance: "Solde total",
     todayChange: "+{{change}}% aujourd'hui",
+    today: "aujourd'hui",
     sendTokens: "Envoyer des jetons",
     receiveTokens: "Recevoir des jetons",
     hideTokens: "Masquer les jetons",

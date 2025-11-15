@@ -30,6 +30,7 @@ export const da = {
     portfolioValue: "Porteføljeværdi",
     totalBalance: "Samlet saldo",
     todayChange: "+{{change}}% i dag",
+    today: "I dag",
     sendTokens: "Send tokens",
     receiveTokens: "Modtag tokens",
     hideTokens: "Skjul tokens",

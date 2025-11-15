@@ -30,6 +30,7 @@ export const vi = {
     portfolioValue: "Giá trị danh mục",
     totalBalance: "Số dư tổng",
     todayChange: "+{{change}}% Hôm nay",
+    today: "Hôm nay",
     sendTokens: "Gửi Token",
     receiveTokens: "Nhận Token",
     hideTokens: "Ẩn Token",

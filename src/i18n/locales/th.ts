@@ -30,6 +30,7 @@ export const th = {
     portfolioValue: "มูลค่าพอร์ตโฟลิโอ",
     totalBalance: "ยอดรวม",
     todayChange: "+{{change}}% วันนี้",
+    today: "วันนี้",
     sendTokens: "ส่งโทเค็น",
     receiveTokens: "รับโทเค็น",
     hideTokens: "ซ่อนโทเค็น",

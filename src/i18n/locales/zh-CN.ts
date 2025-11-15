@@ -30,6 +30,7 @@ export const zhCN = {
     portfolioValue: "投资组合价值",
     totalBalance: "总余额",
     todayChange: "今日 +{{change}}%",
+    today: "今日",
     sendTokens: "发送代币",
     receiveTokens: "接收代币",
     hideTokens: "隐藏代币",

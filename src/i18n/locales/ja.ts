@@ -30,6 +30,7 @@ export const ja = {
     portfolioValue: "ポートフォリオ価値",
     totalBalance: "総残高",
     todayChange: "今日 +{{change}}%",
+    today: "今日",
     sendTokens: "トークンを送信",
     receiveTokens: "トークンを受信",
     hideTokens: "トークンを非表示",

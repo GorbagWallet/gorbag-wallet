@@ -12,9 +12,11 @@ interface PortfolioBalanceProps {
 
 export function PortfolioBalance({ hidden = false, loading = false }: PortfolioBalanceProps) {
   const { t } = useI18n()
-  const { portfolioValue, preferredCurrency } = useWallet();
+  const { portfolioValue, portfolioChange24h, preferredCurrency } = useWallet();
 
-  const formattedBalance = (portfolioValue).toFixed(2);
+  const formattedBalance = portfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formattedChange = Math.abs(portfolioChange24h).toFixed(2);
+  const changeIsPositive = portfolioChange24h >= 0;
   const currencySymbol = currencySymbols[preferredCurrency] || "$";
 
   if (loading) {
@@ -33,9 +35,14 @@ export function PortfolioBalance({ hidden = false, loading = false }: PortfolioB
       <h1 className="plasmo-text-5xl plasmo-font-bold plasmo-text-foreground plasmo-mb-3 plasmo-text-balance plasmo-font-sans">
         {hidden ? "****" : `${currencySymbol}${formattedBalance}`}
       </h1>
-      <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-text-primary">
-        <TrendingUp className="plasmo-h-4 plasmo-w-4" />
-        <span className="plasmo-text-sm plasmo-font-medium">{hidden ? "****" : t("wallet.todayChange", { change: "2.34" })}</span>
+      <div className={`plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 ${changeIsPositive ? 'plasmo-text-green-500' : 'plasmo-text-destructive'}`}>
+        <TrendingUp 
+          className="plasmo-h-4 plasmo-w-4" 
+          style={{ transform: changeIsPositive ? 'rotate(0deg)' : 'rotate(180deg)' }}
+        />
+        <span className="plasmo-text-sm plasmo-font-medium">
+          {hidden ? "****" : t("wallet.todayChange", { change: `${changeIsPositive ? '+' : ''}${formattedChange}` })}
+        </span>
       </div>
     </div>
   );

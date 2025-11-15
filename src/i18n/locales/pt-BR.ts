@@ -30,6 +30,7 @@ export const ptBR = {
     portfolioValue: "Valor da Carteira",
     totalBalance: "Saldo Total",
     todayChange: "+{{change}}% Hoje",
+    today: "Hoje",
     sendTokens: "Enviar Tokens",
     receiveTokens: "Receber Tokens",
     hideTokens: "Ocultar Tokens",
