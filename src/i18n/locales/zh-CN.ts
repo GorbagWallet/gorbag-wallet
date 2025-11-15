@@ -250,9 +250,10 @@ export const zhCN = {
     price: "价格",
     "24hChange": "24小时变化",
     marketCap: "市值",
-    noActivity: "暂无活动",
-    buy: "购买",
-    sell: "出售"
+    noActivity: \"暂无活动\",
+    buy: \"购买\",
+    sell: \"出售\",
+    send: \"发送\"
   },
   banner: {
     claim: "领取",

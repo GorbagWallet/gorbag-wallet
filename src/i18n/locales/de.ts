@@ -252,7 +252,8 @@ export const de = {
     marketCap: "Marktkapitalisierung",
     noActivity: "Noch keine Aktivität",
     buy: "Kaufen",
-    sell: "Verkaufen"
+    sell: "Verkaufen",
+    send: "Senden"
   },
   banner: {
     claim: "Beanspruchen",

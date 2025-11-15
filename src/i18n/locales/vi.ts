@@ -252,7 +252,8 @@ export const vi = {
     marketCap: "Vốn hóa thị trường",
     noActivity: "Chưa có hoạt động",
     buy: "Mua",
-    sell: "Bán"
+    sell: "Bán",
+    send: "Gửi"
   },
   banner: {
     claim: "Nhận",

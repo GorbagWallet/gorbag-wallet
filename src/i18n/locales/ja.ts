@@ -250,9 +250,10 @@ export const ja = {
     price: "価格",
     "24hChange": "24時間変動",
     marketCap: "時価総額",
-    noActivity: "アクティビティはまだありません",
+    noActivity: "まだアクティビティがありません",
     buy: "購入",
-    sell: "売却"
+    sell: "売却",
+    send: "送信"
   },
   banner: {
     claim: "請求",

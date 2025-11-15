@@ -252,7 +252,8 @@ export const ko = {
     marketCap: "시가총액",
     noActivity: "아직 활동이 없습니다",
     buy: "구매",
-    sell: "판매"
+    sell: "판매",
+    send: "보내기"
   },
   banner: {
     claim: "청구",

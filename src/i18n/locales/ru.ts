@@ -250,9 +250,10 @@ export const ru = {
     price: "Цена",
     "24hChange": "Изменение за 24ч",
     marketCap: "Капитализация",
-    noActivity: "Пока нет активности",
+    noActivity: "Активность отсутствует",
     buy: "Купить",
-    sell: "Продать"
+    sell: "Продать",
+    send: "Отправить"
   },
   banner: {
     claim: "Получить",

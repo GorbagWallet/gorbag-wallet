@@ -252,7 +252,8 @@ export const da = {
     marketCap: "Markedskapitalisering",
     noActivity: "Ingen aktivitet endnu",
     buy: "Køb",
-    sell: "Sælg"
+    sell: "Sælg",
+    send: "Send"
   },
   banner: {
     claim: "Gør krav",

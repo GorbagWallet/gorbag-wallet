@@ -252,7 +252,8 @@ export const th = {
     marketCap: "มูลค่าตลาด",
     noActivity: "ยังไม่มีกิจกรรม",
     buy: "ซื้อ",
-    sell: "ขาย"
+    sell: "ขาย",
+    send: "ส่ง"
   },
   banner: {
     claim: "รับ",

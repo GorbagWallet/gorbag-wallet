@@ -12,6 +12,7 @@ import bs58 from "bs58";
 import { Keypair } from "@solana/web3.js";
 import { PasswordStep } from "./steps/password-step";
 import { EnterExistingPasswordStep } from "./steps/enter-existing-password-step";
+import { storeWalletPublicKey } from "~/lib/api-service";
 
 type CreateStepExtended = "password" | "enterExistingPassword" | "nickname" | "seed" | "verify" | "loading" | "postOnboarding";
 
@@ -89,6 +90,24 @@ export function CreateWalletFlow({ onBack, onDashboard }: CreateWalletFlowProps)
               console.error("CreateWalletFlow: Error creating session:", sessionError); // DEBUG
             }
           }
+          
+          // Call the background script to store the wallet public key in the backend
+          // Don't wait for this to complete, just fire and forget
+          console.log("Sending message to store wallet:", wallet.address); // DEBUG
+          chrome.runtime.sendMessage({
+            source: "gorbag-ui",
+            method: "store-wallet",
+            params: { publicKey: wallet.address }
+          }).then(response => {
+            console.log("Received response from background for wallet storage:", response); // DEBUG
+            if (response && response.success) {
+              console.log("Wallet public key stored successfully in backend:", wallet.address);
+            } else {
+              console.error("Failed to store wallet public key in backend:", response?.error);
+            }
+          }).catch(error => {
+            console.error("Error calling background script to store wallet:", error);
+          });
           
           setStep("postOnboarding");
         } catch (error) {

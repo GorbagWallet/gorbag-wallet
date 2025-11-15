@@ -14,6 +14,95 @@ interface Wallet {
   // Add other properties if needed by background script
 }
 
+// API functions to be used in the background script
+const BACKEND_URL = "https://gorbag-server.vercel.app";
+
+interface CreateUserRequest {
+  base58_public_key: string;
+}
+
+interface CreateUserResponse {
+  message: string;
+  base58_public_key: string;
+}
+
+interface CreateTransactionRequest {
+  transaction_hash: string;
+  user_public_key: string;
+}
+
+interface CreateTransactionResponse {
+  message: string;
+  transaction_hash: string;
+}
+
+/**
+ * Creates a new user in the backend with the wallet's public key
+ * @param publicKey The base58 encoded public key of the wallet
+ */
+async function storeWalletPublicKey(publicKey: string): Promise<CreateUserResponse> {
+  try {
+    console.log("Making request to store wallet:", publicKey); // DEBUG
+    const response = await fetch(`${BACKEND_URL}/api/v1/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        base58_public_key: publicKey
+      } as CreateUserRequest)
+    });
+
+    console.log("Received response from backend for wallet storage:", response.status); // DEBUG
+    const data = await response.json();
+    
+    console.log("Parsed response data:", data); // DEBUG
+    if (!response.ok) {
+      throw new Error(data.error || `Failed to store wallet: ${response.status}`);
+    }
+    
+    return data as CreateUserResponse;
+  } catch (error) {
+    console.error('Error storing wallet public key:', error);
+    throw error;
+  }
+}
+
+/**
+ * Records a transaction in the backend
+ * @param transactionHash The transaction hash
+ * @param userPublicKey The user's public key
+ */
+async function storeTransaction(transactionHash: string, userPublicKey: string): Promise<CreateTransactionResponse> {
+  try {
+    console.log("Making request to store transaction:", transactionHash); // DEBUG
+    const response = await fetch(`${BACKEND_URL}/api/v1/transactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        transaction_hash: transactionHash,
+        user_public_key: userPublicKey
+      } as CreateTransactionRequest)
+    });
+
+    console.log("Received response from backend for transaction storage:", response.status); // DEBUG
+    const data = await response.json();
+    
+    console.log("Parsed response data:", data); // DEBUG
+    if (!response.ok) {
+      throw new Error(data.error || `Failed to store transaction: ${response.status}`);
+    }
+    
+    return data as CreateTransactionResponse;
+  } catch (error) {
+    console.error('Error storing transaction:', error);
+    throw error;
+  }
+}
+
+
 // --- Connection Request Management ---
 interface PendingRequest {
   sendResponse: (response: any) => void;
@@ -173,6 +262,54 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           isConnected: !!currentActiveWallet,
           publicKey: currentActiveWallet ? currentActiveWallet.address : null,
         });
+        return;
+
+      // --- New methods for storing wallet and transaction data ---
+      case "store-wallet":
+        console.log("Background script received store-wallet request:", params); // DEBUG
+        // Store a new wallet's public key in the backend (fire and forget)
+        (async () => {
+          try {
+            const { publicKey } = params;
+            if (!publicKey) {
+              console.error("Public key is required for store-wallet");
+              return;
+            }
+            
+            // Call the local API function
+            const result = await storeWalletPublicKey(publicKey);
+            
+            console.log("Wallet stored successfully in backend:", publicKey);
+          } catch (error) {
+            console.error("Error storing wallet in backend:", error);
+          }
+        })();
+        
+        // Send response immediately to not block the UI
+        sendResponse({ success: true });
+        return;
+
+      case "store-transaction":
+        console.log("Background script received store-transaction request:", params); // DEBUG
+        // Store a transaction in the backend (fire and forget)
+        (async () => {
+          try {
+            const { transactionHash, userPublicKey } = params;
+            if (!transactionHash || !userPublicKey) {
+              console.error("Transaction hash and user public key are required for store-transaction");
+              return;
+            }
+            
+            const result = await storeTransaction(transactionHash, userPublicKey);
+            
+            console.log("Transaction stored successfully in backend:", transactionHash);
+          } catch (error) {
+            console.error("Error storing transaction in backend:", error);
+          }
+        })();
+        
+        // Send response immediately to not block the UI
+        sendResponse({ success: true });
         return;
 
       // --- New methods for the confirmation UI ---

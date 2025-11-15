@@ -252,7 +252,8 @@ export const ptBR = {
     marketCap: "Valor de Mercado",
     noActivity: "Nenhuma atividade ainda",
     buy: "Comprar",
-    sell: "Vender"
+    sell: "Vender",
+    send: "Enviar"
   },
   banner: {
     claim: "Reivindicar",

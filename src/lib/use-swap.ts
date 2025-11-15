@@ -242,6 +242,24 @@ export const useSwap = (): [SwapState, SwapActions] => {
         toAmount: ""
       }));
 
+      // Call the background script to store the transaction in the backend
+      // Don't wait for this to complete, just fire and forget
+      if (txId && activeWallet?.address) {
+        chrome.runtime.sendMessage({
+          source: "gorbag-ui",
+          method: "store-transaction",
+          params: { transactionHash: txId, userPublicKey: activeWallet.address }
+        }).then(response => {
+          if (response && response.success) {
+            console.log("Swap transaction stored successfully in backend:", txId);
+          } else {
+            console.error("Failed to store swap transaction in backend:", response?.error);
+          }
+        }).catch(error => {
+          console.error("Error calling background script to store swap transaction:", error);
+        });
+      }
+
       return txId;
     } catch (error) {
       console.error("Error executing swap:", error);

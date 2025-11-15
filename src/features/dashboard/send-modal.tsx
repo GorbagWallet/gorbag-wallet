@@ -10,6 +10,7 @@ import { useWallet } from "~/lib/wallet-context"
 import { networks } from "~/lib/config"
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js"
 import { useI18n } from "~/i18n/context"
+import { storeTransaction } from "~/lib/api-service";
 import successIcon from "data-base64:~assets/icons/icons8-success-24.png"
 import cancelIcon from "data-base64:~assets/icons/icons8-cancel-24.png"
 import errorIcon from "data-base64:~assets/icons/icons8-error-24.png"
@@ -222,6 +223,22 @@ export function SendModal({ open, onClose }: SendModalProps) {
       
       // Clear the transaction history cache after a successful transaction
       clearTransactionHistoryCache();
+      
+      // Call the background script to store the transaction in the backend
+      // Don't wait for this to complete, just fire and forget
+      chrome.runtime.sendMessage({
+        source: "gorbag-ui",
+        method: "store-transaction",
+        params: { transactionHash: txHash, userPublicKey: activeWallet.address }
+      }).then(response => {
+        if (response && response.success) {
+          console.log("Transaction stored successfully in backend:", txHash);
+        } else {
+          console.error("Failed to store transaction in backend:", response?.error);
+        }
+      }).catch(error => {
+        console.error("Error calling background script to store transaction:", error);
+      });
       
       setStep("success")
     } catch (err) {

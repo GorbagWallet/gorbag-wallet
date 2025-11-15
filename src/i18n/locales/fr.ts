@@ -252,7 +252,8 @@ export const fr = {
     marketCap: "Capitalisation boursière",
     noActivity: "Aucune activité pour le moment",
     buy: "Acheter",
-    sell: "Vendre"
+    sell: "Vendre",
+    send: "Envoyer"
   },
   banner: {
     claim: "Réclamer",

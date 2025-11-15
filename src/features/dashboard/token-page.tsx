@@ -8,6 +8,7 @@ import { useI18n } from "~/i18n/context"
 import { TokenCard } from "~/components/token-card"
 import { ActionButtons } from "../dashboard/action-buttons"
 import { TokenDetailsSkeleton } from "./token-details-skeleton"
+import { InteractiveChart } from "~/components/interactive-chart"
 
 // Import local token icons
 import solIcon from "data-base64:~assets/token-icons/sol.png"
@@ -75,11 +76,13 @@ function getTokenIcon(symbol: string, imageUrl?: string): string {
 
 export default function TokenPage({ tokenSymbol, onBack }: TokenPageProps) {
   const { t } = useI18n()
-  const { tokens, network, preferredCurrency } = useWallet()
+  const { tokens, network, preferredCurrency, getTransactionHistory } = useWallet()
   const [token, setToken] = useState<any>(null)
   const [tokenDetails, setTokenDetails] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState<"overview" | "activity">("overview")
+  const [activeTab, setActiveTab] = useState<"overview" | "activity">("activity")
   const [tokenDetailsLoading, setTokenDetailsLoading] = useState(false)
+  const [transactionHistory, setTransactionHistory] = useState<any[]>([])
+  const [historyLoading, setHistoryLoading] = useState(true)
   
   useEffect(() => {
     const foundToken = tokens.find(token => 
@@ -92,12 +95,24 @@ export default function TokenPage({ tokenSymbol, onBack }: TokenPageProps) {
 
   useEffect(() => {
     if (token && tokenSymbol) {
-      // Fetch detailed token information
+      // Fetch detailed token information using the new crypto data service
       const fetchTokenDetails = async () => {
         setTokenDetailsLoading(true);
         try {
-          const { getTokenDetails } = await import("~/lib/currency");
-          const details = await getTokenDetails(tokenSymbol, preferredCurrency);
+          const { cryptoDataService, Network } = await import("~/lib/crypto-data-service");
+          
+          // Determine the mint address based on token structure
+          let mintAddress: string | undefined;
+          if (token.id) {
+            mintAddress = token.id;
+          } else if (token.content?.metadata?.symbol === "SOL") {
+            // Special handling for SOL native token
+            mintAddress = "So11111111111111111111111111111111111111112";
+          }
+          
+          console.log("Fetching token details for:", { tokenSymbol, mintAddress, network, token });
+          
+          const details = await cryptoDataService.getTokenDetails(tokenSymbol, preferredCurrency, network as Network, mintAddress);
           setTokenDetails(details);
         } catch (error) {
           console.error("Error fetching token details:", error);
@@ -109,7 +124,36 @@ export default function TokenPage({ tokenSymbol, onBack }: TokenPageProps) {
 
       fetchTokenDetails();
     }
-  }, [tokenSymbol, preferredCurrency]);
+  }, [token, tokenSymbol, preferredCurrency, network]);
+
+  useEffect(() => {
+    if (token) {
+      // Fetch transaction history for the token
+      const fetchTransactionHistory = async () => {
+        setHistoryLoading(true);
+        try {
+          const history = await getTransactionHistory();
+          // Filter transactions related to this token
+          const tokenAddress = token.id; // This might need adjustment based on actual token format
+          const filteredHistory = history.filter(tx => {
+            // This is a simplified filter - in reality, you'd need to check if the transaction involves the token
+            // For now, return all transactions; you can enhance this logic later
+            return true;
+          }).slice(0, 10); // Limit to 10 most recent
+          setTransactionHistory(filteredHistory);
+        } catch (error) {
+          console.error("Error fetching transaction history:", error);
+          setTransactionHistory([]);
+        } finally {
+          setHistoryLoading(false);
+        }
+      };
+
+      fetchTransactionHistory();
+    }
+  }, [token, getTransactionHistory]);
+
+  
 
   if (!token) {
     return (
@@ -197,6 +241,15 @@ export default function TokenPage({ tokenSymbol, onBack }: TokenPageProps) {
 
           {activeTab === "overview" && (
           <div className="plasmo-space-y-4">
+            {/* Chart Section */}
+            <InteractiveChart 
+              symbol={token.content.metadata.symbol}
+              currency={preferredCurrency}
+              network={network as "solana" | "gorbagana"}
+              initialDays={7}
+              title={`${token.content.metadata.symbol} Price Chart`}
+            />
+            
             {tokenDetailsLoading ? (
               <TokenDetailsSkeleton 
                 tokenSymbol={token.content.metadata.symbol}
@@ -206,78 +259,90 @@ export default function TokenPage({ tokenSymbol, onBack }: TokenPageProps) {
               />
             ) : (
               <>
-                <div className="plasmo-bg-card plasmo-rounded-xl plasmo-p-4">
-                  <h3 className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground plasmo-mb-3">{t("token.tokenInfo")}</h3>
-                  <div className="plasmo-space-y-3">
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.symbol")}</span>
-                      <span className="plasmo-text-foreground">{token.content.metadata.symbol}</span>
-                    </div>
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.name")}</span>
-                      <span className="plasmo-text-foreground">{token.content.metadata.name}</span>
-                    </div>
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.decimals")}</span>
-                      <span className="plasmo-text-foreground">{token.token_info.decimals}</span>
-                    </div>
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.totalSupply")}</span>
-                      <span className="plasmo-text-foreground">
-                        {tokenDetails !== undefined && tokenDetails !== null ? 
-                          (tokenDetails.totalSupply ? 
-                            (tokenDetails.totalSupply > 1e9 ? 
-                              `${(tokenDetails.totalSupply / 1e9).toFixed(2)}B` : 
-                              tokenDetails.totalSupply.toLocaleString()) : 
-                            'N/A') : 
-                          t("common.loading")}
-                      </span>
+                {network === "gorbagana" ? (
+                  <div className="plasmo-bg-card plasmo-rounded-xl plasmo-p-6">
+                    <div className="plasmo-text-center">
+                      <div className="plasmo-text-foreground plasmo-font-medium plasmo-mb-2">
+                        Token Details
+                      </div>
+                      <p className="plasmo-text-muted-foreground plasmo-text-sm">
+                        Detailed token information coming soon for Gorbagana network
+                      </p>
+                      <div className="plasmo-mt-4 plasmo-text-xs plasmo-text-muted-foreground">
+                        <p>Symbol: {token.content.metadata.symbol}</p>
+                        <p>Name: {token.content.metadata.name}</p>
+                        <p>Decimals: {token.token_info.decimals}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <div className="plasmo-bg-card plasmo-rounded-xl plasmo-p-4">
+                      <h3 className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground plasmo-mb-3">{t("token.tokenInfo")}</h3>
+                      <div className="plasmo-space-y-3">
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.symbol")}</span>
+                          <span className="plasmo-text-foreground">{token.content.metadata.symbol}</span>
+                        </div>
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.name")}</span>
+                          <span className="plasmo-text-foreground">{token.content.metadata.name}</span>
+                        </div>
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.decimals")}</span>
+                          <span className="plasmo-text-foreground">{token.token_info.decimals}</span>
+                        </div>
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.totalSupply")}</span>
+                          <span className="plasmo-text-foreground">
+                            {tokenDetails && tokenDetails.totalSupply ? 
+                              (tokenDetails.totalSupply > 1e9 ? 
+                                `${(tokenDetails.totalSupply / 1e9).toFixed(2)}B` : 
+                                tokenDetails.totalSupply.toLocaleString()) : 
+                              'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="plasmo-bg-card plasmo-rounded-xl plasmo-p-4">
-                  <h3 className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground plasmo-mb-3">{t("token.priceInfo")}</h3>
-                  <div className="plasmo-space-y-3">
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.price")}</span>
-                      <span className="plasmo-text-foreground">
-                        {tokenDetails !== undefined && tokenDetails !== null ? 
-                          (tokenDetails.price ? 
-                            `${tokenDetails.price.toLocaleString(undefined, { 
-                              style: 'currency', 
-                              currency: preferredCurrency 
-                            })}` : 
-                            'N/A') : 
-                          t("common.loading")}
-                      </span>
+                    <div className="plasmo-bg-card plasmo-rounded-xl plasmo-p-4">
+                      <h3 className="plasmo-text-sm plasmo-font-medium plasmo-text-foreground plasmo-mb-3">{t("token.priceInfo")}</h3>
+                      <div className="plasmo-space-y-3">
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.price")}</span>
+                          <span className="plasmo-text-foreground">
+                            {tokenDetails && tokenDetails.price ? 
+                              `${tokenDetails.price.toLocaleString(undefined, { 
+                                style: 'currency', 
+                                currency: preferredCurrency 
+                              })}` : 
+                              'N/A'}
+                          </span>
+                        </div>
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.24hChange")}</span>
+                          <span className={`plasmo-text-foreground ${tokenDetails && tokenDetails.priceChange24h !== undefined && tokenDetails.priceChange24h >= 0 ? "plasmo-text-green-500" : "plasmo-text-destructive"}`}>
+                            {tokenDetails && tokenDetails.priceChange24h !== undefined ? 
+                              `${tokenDetails.priceChange24h > 0 ? '+' : ''}${tokenDetails.priceChange24h.toFixed(2)}%` : 
+                              'N/A'}
+                          </span>
+                        </div>
+                        <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
+                          <span className="plasmo-text-muted-foreground">{t("token.marketCap")}</span>
+                          <span className="plasmo-text-foreground">
+                            {tokenDetails && tokenDetails.marketCap ? 
+                              `${tokenDetails.marketCap.toLocaleString(undefined, { 
+                                style: 'currency', 
+                                currency: preferredCurrency,
+                                notation: tokenDetails.marketCap >= 1e9 ? 'compact' : 'standard'
+                              })}` : 
+                              'N/A'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.24hChange")}</span>
-                      <span className={`plasmo-text-foreground ${tokenDetails !== undefined && tokenDetails !== null && tokenDetails.priceChange24h !== undefined && tokenDetails.priceChange24h >= 0 ? "text-green-500" : "text-destructive"}`}>
-                        {tokenDetails !== undefined && tokenDetails !== null ? 
-                          (tokenDetails.priceChange24h ? 
-                            `${tokenDetails.priceChange24h > 0 ? '+' : ''}${tokenDetails.priceChange24h.toFixed(2)}%` : 
-                            'N/A') : 
-                          t("common.loading")}
-                      </span>
-                    </div>
-                    <div className="plasmo-flex plasmo-justify-between plasmo-text-sm">
-                      <span className="plasmo-text-muted-foreground">{t("token.marketCap")}</span>
-                      <span className="plasmo-text-foreground">
-                        {tokenDetails !== undefined && tokenDetails !== null ? 
-                          (tokenDetails.marketCap ? 
-                            `${tokenDetails.marketCap.toLocaleString(undefined, { 
-                              style: 'currency', 
-                              currency: preferredCurrency,
-                              notation: tokenDetails.marketCap >= 1e9 ? 'compact' : 'standard'
-                            })}` : 
-                            'N/A') : 
-                          t("common.loading")}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -285,28 +350,107 @@ export default function TokenPage({ tokenSymbol, onBack }: TokenPageProps) {
 
           {activeTab === "activity" && (
             <div className="plasmo-space-y-4">
-              <div className="plasmo-text-center plasmo-py-8">
-                <Activity className="plasmo-h-12 plasmo-w-12 plasmo-text-muted-foreground plasmo-mx-auto plasmo-mb-3" />
-                <p className="plasmo-text-muted-foreground">{t("token.noActivity")}</p>
-              </div>
+              {historyLoading ? (
+                <div className="plasmo-text-center plasmo-py-8">
+                  <div className="plasmo-flex plasmo-justify-center plasmo-mb-3">
+                    <div className="plasmo-h-12 plasmo-w-12 plasmo-bg-muted plasmo-animate-pulse plasmo-rounded-full"></div>
+                  </div>
+                  <p className="plasmo-text-muted-foreground">{t("common.loading")}</p>
+                </div>
+              ) : transactionHistory.length === 0 ? (
+                <div className="plasmo-text-center plasmo-py-8">
+                  <Activity className="plasmo-h-12 plasmo-w-12 plasmo-text-muted-foreground plasmo-mx-auto plasmo-mb-3" />
+                  <p className="plasmo-text-muted-foreground">{t("token.noActivity")}</p>
+                </div>
+              ) : (
+                <div className="plasmo-space-y-3">
+                  {transactionHistory.map((tx, index) => (
+                    <div key={index} className="plasmo-bg-card plasmo-rounded-xl plasmo-p-4 plasmo-flex plasmo-items-center plasmo-justify-between">
+                      <div className="plasmo-flex plasmo-items-center plasmo-gap-3">
+                        <div className={`plasmo-w-10 plasmo-h-10 plasmo-rounded-full plasmo-flex plasmo-items-center plasmo-justify-center ${
+                          tx.transaction?.message?.instructions?.[0]?.programId?.toString?.().includes?.('SystemProgram') 
+                            ? 'plasmo-bg-green-500/10' 
+                            : 'plasmo-bg-destructive/10'
+                        }`}>
+                          {tx.transaction?.message?.instructions?.[0]?.programId?.toString?.().includes?.('SystemProgram') ? (
+                            <Maximize2 className="plasmo-h-5 plasmo-w-5 plasmo-text-green-500" />
+                          ) : (
+                            <Maximize2 className="plasmo-h-5 plasmo-w-5 plasmo-text-destructive" transform="rotate(180)" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="plasmo-font-medium plasmo-text-foreground">
+                            {tx.transaction?.message?.instructions?.[0]?.programId?.toString?.().includes?.('SystemProgram') 
+                              ? t("activity.sent") 
+                              : t("activity.received")}
+                          </p>
+                          <p className="plasmo-text-xs plasmo-text-muted-foreground">
+                            {tx.blockTime ? new Date(tx.blockTime * 1000).toLocaleDateString() : 'Date unknown'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="plasmo-text-right">
+                        <p className="plasmo-font-medium plasmo-text-foreground">
+                          {tx.transaction?.message?.instructions?.[0]?.programId?.toString?.().includes?.('SystemProgram') 
+                            ? '-' 
+                            : '+'}
+                          {tx.transaction?.meta?.fee 
+                            ? (tx.transaction.meta.fee / 1_000_000_000).toFixed(6) 
+                            : '0.000000'} {network === "gorbagana" ? "GOR" : "SOL"}
+                        </p>
+                        <p className="plasmo-text-xs plasmo-text-muted-foreground">
+                          {tx.signature?.substring(0, 6)}...{tx.signature?.substring(tx.signature.length - 4)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           <div className="plasmo-pt-6">
-            <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-3">
-              <Button className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary/10 hover:plasmo-bg-primary/20 plasmo-text-primary plasmo-animate-pop">
+            <div className="plasmo-grid plasmo-grid-cols-3 plasmo-gap-3">
+              <Button 
+                className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary/10 hover:plasmo-bg-primary/20 plasmo-text-primary plasmo-animate-pop"
+                onClick={() => window.open(`https://www.moonpay.com/buy/${tokenSymbol.toLowerCase()}`, '_blank')}
+              >
                 <Plus className="plasmo-h-4 plasmo-w-4" />
                 {t("token.buy")}
               </Button>
-              <Button className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary/10 hover:plasmo-bg-primary/20 plasmo-text-primary plasmo-animate-pop">
+              <Button 
+                className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-12 plasmo-rounded-xl plasmo-bg-destructive/10 hover:plasmo-bg-destructive/20 plasmo-text-destructive plasmo-animate-pop"
+                onClick={() => {
+                  // For sell, we'll use swap with SOL as default receive token if on SOL network
+                  if (network === "solana") {
+                    // This would need to navigate to swap page with token pre-selected
+                    // For now, we can't navigate from here without router hooks
+                    // We'll implement this when we add proper routing
+                    window.open(`https://www.moonpay.com/sell/${tokenSymbol.toLowerCase()}`, '_blank');
+                  } else {
+                    // For other networks, use a generic sell approach
+                    window.open(`https://www.moonpay.com/sell/${tokenSymbol.toLowerCase()}`, '_blank');
+                  }
+                }}
+              >
                 <Minus className="plasmo-h-4 plasmo-w-4" />
                 {t("token.sell")}
               </Button>
-            </div>
-            <div className="plasmo-mt-3">
-              <Button className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-animate-pop">
+              <Button 
+                className="plasmo-flex plasmo-items-center plasmo-gap-2 plasmo-h-12 plasmo-rounded-xl plasmo-bg-primary hover:plasmo-bg-primary/90 plasmo-text-primary-foreground plasmo-animate-pop"
+                onClick={() => {
+                  // This would trigger the send modal with this token pre-selected
+                  // For now we'll just log that the send action was initiated
+                  console.log("Initiating send for token:", token.content.metadata.symbol, 
+                    "Balance:", token.token_info.balance, 
+                    "Decimals:", token.token_info.decimals);
+                  // In a real implementation, this would communicate with the parent component
+                  // to open the send modal with this token pre-filled
+                  alert(`Sending ${token.content.metadata.symbol} - ${formatTokenAmount(token.token_info.balance, token.token_info.decimals)}`);
+                }}
+              >
                 <Maximize2 className="plasmo-h-4 plasmo-w-4" />
-                {t("swap.swapButton")}
+                {t("token.send")}
               </Button>
             </div>
           </div>

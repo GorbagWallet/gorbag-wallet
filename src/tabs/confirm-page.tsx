@@ -8,6 +8,7 @@ import { WalletProvider } from "../lib/wallet-context";
 import { WalletLockScreen } from "../components/wallet-lock-screen";
 import { useWallet } from "../lib/wallet-context";
 import { Copy } from "lucide-react";
+import bs58 from "bs58";
 
 function ConfirmationPageContent() {
   const { showConnectionRequest, pendingRequest, approveConnection, rejectConnection } = useDappConnection();
@@ -198,6 +199,9 @@ function ConfirmationPageContent() {
             const serializedSignedTx = Buffer.from(signedTx.serialize()).toString('base64');
             console.log("[confirm-page.tsx] resolveRequest: serialized signed transaction", serializedSignedTx);
             
+            // Get the transaction signature to store in the backend
+            const txSignature = bs58.encode(signedTx.signature);
+            
             await chrome.runtime.sendMessage({
               source: "gorbag-ui",
               method: "resolve-pending-request",
@@ -206,6 +210,22 @@ function ConfirmationPageContent() {
                 type: "transaction",
                 signedTransaction: serializedSignedTx
               }
+            });
+
+            // Call the background script to store the transaction in the backend
+            // Don't wait for this to complete, just fire and forget
+            chrome.runtime.sendMessage({
+              source: "gorbag-ui",
+              method: "store-transaction",
+              params: { transactionHash: txSignature, userPublicKey: pendingTransaction.walletAddress }
+            }).then(response => {
+              if (response && response.success) {
+                console.log("DApp transaction stored successfully in backend:", txSignature);
+              } else {
+                console.error("Failed to store DApp transaction in backend:", response?.error);
+              }
+            }).catch(error => {
+              console.error("Error calling background script to store DApp transaction:", error);
             });
 
           } catch (error) {
