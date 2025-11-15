@@ -234,7 +234,13 @@ export const ru = {
   nft: {
     title: "NFT",
     comingSoon: "Скоро",
-    description: "Поддержка NFT скоро появится в кошельке Gorbag"
+    description: "Поддержка NFT скоро появится в кошельке Gorbag",
+    yourNFTs: "Ваши NFT",
+    noNFTs: "Нет NFT",
+    noNFTsDescription: "У вас еще нет NFT",
+    getGorbagioNFT: "Получите NFT Gorbagio",
+    getGorbagioNFTDescription: "Исследуйте коллекцию Gorbagio на Magic Eden",
+    getOnMagicEden: "Получить на Magic Eden"
   },
   token: {
     title: "Детали токена",

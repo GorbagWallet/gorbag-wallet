@@ -30,7 +30,6 @@ export const en = {
     portfolioValue: "Portfolio Value",
     totalBalance: "Total Balance",
     todayChange: "+{{change}}% Today",
-    today: "Today",
     sendTokens: "Send Tokens",
     receiveTokens: "Receive Tokens",
     hideTokens: "Hide Tokens",
@@ -39,7 +38,10 @@ export const en = {
     networkGorbagana: "Gorbagana Network",
     viewDetails: "View Details",
     addWallet: "+ Add Wallet",
-    swapTokens: "Swap Tokens"
+    swapTokens: "Swap Tokens",
+    searchTokens: "Search tokens...",
+    noTokensFound: "No tokens found",
+    noTokensFoundDescription: "Try adjusting your search or add more tokens to your wallet"
   },
   send: {
     title: "Send Tokens",
@@ -234,7 +236,13 @@ export const en = {
   nft: {
     title: "NFTs",
     comingSoon: "Coming Soon",
-    description: "NFT support is coming to Gorbag Wallet"
+    description: "NFT support is coming to Gorbag Wallet",
+    yourNFTs: "Your NFTs",
+    noNFTs: "No NFTs",
+    noNFTsDescription: "You don't own any NFTs yet",
+    getGorbagioNFT: "Get a Gorbagio NFT",
+    getGorbagioNFTDescription: "Explore the Gorbagio collection on Magic Eden",
+    getOnMagicEden: "Get on Magic Eden"
   },
   token: {
     title: "Token Details",

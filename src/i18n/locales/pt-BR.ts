@@ -39,7 +39,10 @@ export const ptBR = {
     networkGorbagana: "Rede Gorbagana",
     viewDetails: "Ver Detalhes",
     addWallet: "+ Adicionar Carteira",
-    swapTokens: "Trocar Tokens"
+    swapTokens: "Trocar Tokens",
+    searchTokens: "Buscar tokens...",
+    noTokensFound: "Nenhum token encontrado",
+    noTokensFoundDescription: "Tente ajustar sua busca ou adicione mais tokens à sua carteira"
   },
   send: {
     title: "Enviar Tokens",
@@ -234,7 +237,13 @@ export const ptBR = {
   nft: {
     title: "NFTs",
     comingSoon: "Em Breve",
-    description: "Suporte a NFT está chegando ao Gorbag Wallet"
+    description: "Suporte a NFT está chegando ao Gorbag Wallet",
+    yourNFTs: "Seus NFTs",
+    noNFTs: "Nenhum NFT",
+    noNFTsDescription: "Você ainda não possui nenhum NFT",
+    getGorbagioNFT: "Obtenha um NFT Gorbagio",
+    getGorbagioNFTDescription: "Explore a coleção Gorbagio no Magic Eden",
+    getOnMagicEden: "Obtenha no Magic Eden"
   },
   token: {
     title: "Detalhes do Token",

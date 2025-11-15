@@ -234,7 +234,13 @@ export const vi = {
   nft: {
     title: "NFT",
     comingSoon: "Sắp ra mắt",
-    description: "Hỗ trợ NFT sắp có trên Ví Gorbag"
+    description: "Hỗ trợ NFT sắp có trên Ví Gorbag",
+    yourNFTs: "NFT của bạn",
+    noNFTs: "Không có NFT",
+    noNFTsDescription: "Bạn chưa sở hữu NFT nào",
+    getGorbagioNFT: "Nhận NFT Gorbagio",
+    getGorbagioNFTDescription: "Khám phá bộ sưu tập Gorbagio trên Magic Eden",
+    getOnMagicEden: "Nhận trên Magic Eden"
   },
   token: {
     title: "Chi tiết Token",

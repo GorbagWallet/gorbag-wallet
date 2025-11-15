@@ -18,29 +18,66 @@ export async function getBalance(address: string, rpcUrl: string): Promise<numbe
   }
 }
 
-export async function getWalletTokens(address: string, heliusApiKey: string) {
-  const url = `https://mainnet.helius-rpc.com/?api-key=${heliusApiKey}`;
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'my-id',
-        method: 'searchAssets',
-        params: {
-          ownerAddress: address,
-          tokenType: 'fungible',
+export async function getWalletTokens(address: string, heliusApiKey: string, network: "gorbagana" | "solana" = "solana") {
+  if (network === "solana") {
+    // Use Helius API for Solana tokens
+    const url = `https://mainnet.helius-rpc.com/?api-key=${heliusApiKey}`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      }),
-    });
-    const { result } = await response.json();
-    return result.items;
-  } catch (error) {
-    console.error("Error fetching wallet tokens:", error);
-    return [];
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'my-id',
+          method: 'searchAssets',
+          params: {
+            ownerAddress: address,
+            tokenType: 'fungible',
+          },
+        }),
+      });
+      const { result } = await response.json();
+      return result.items;
+    } catch (error) {
+      console.error("Error fetching wallet tokens from Helius:", error);
+      return [];
+    }
+  } else {
+    // For Gorbagana, use standard Solana RPC to get token accounts
+    // This will work with the Gorbagana RPC endpoint
+    try {
+      const { networks } = await import('./config');
+      const rpcUrl = networks.gorbagana.rpc;
+      const connection = new Connection(rpcUrl);
+      const publicKey = new PublicKey(address);
+      
+      // Get all token accounts owned by the wallet
+      const resp = await connection.getTokenAccountsByOwner(
+        publicKey,
+        { programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") } // SPL Token Program ID
+      );
+      
+      // Convert to a format similar to Helius response
+      const tokens = resp.value.map(tokenAccount => {
+        const accountInfo = tokenAccount.account.data.parsed.info;
+        return {
+          id: tokenAccount.pubkey.toString(), // Token account address
+          mint: accountInfo.mint, // Token mint address
+          amount: accountInfo.tokenAmount.uiAmount,
+          decimals: accountInfo.tokenAmount.decimals,
+          symbol: accountInfo.mint.substring(0, 6), // Default to first 6 chars of mint as symbol
+          name: accountInfo.mint.substring(0, 10),  // Default to first 10 chars of mint as name
+          tokenType: accountInfo.tokenAmount.uiAmount === 1 ? 'nft' : 'fungible',
+        };
+      });
+      
+      return tokens;
+    } catch (error) {
+      console.error("Error fetching wallet tokens from Gorbagana RPC:", error);
+      return [];
+    }
   }
 }
 

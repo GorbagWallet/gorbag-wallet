@@ -234,7 +234,13 @@ export const zhCN = {
   nft: {
     title: "NFT",
     comingSoon: "即将推出",
-    description: "NFT支持即将添加到Gorbag钱包"
+    description: "NFT支持即将添加到Gorbag钱包",
+    yourNFTs: "您的 NFT",
+    noNFTs: "没有 NFT",
+    noNFTsDescription: "您还没有任何 NFT",
+    getGorbagioNFT: "获取 Gorbagio NFT",
+    getGorbagioNFTDescription: "在 Magic Eden 上探索 Gorbagio 收藏",
+    getOnMagicEden: "在 Magic Eden 上获取"
   },
   token: {
     title: "代币详情",

@@ -39,7 +39,10 @@ export const ja = {
     networkGorbagana: "Gorbaganaネットワーク",
     viewDetails: "詳細を表示",
     addWallet: "+ ウォレットを追加",
-    swapTokens: "トークンをスワップ"
+    swapTokens: "トークンを交換",
+    searchTokens: "トークンを検索...",
+    noTokensFound: "トークンが見つかりません",
+    noTokensFoundDescription: "検索条件を調整するか、ウォレットにトークンを追加してください"
   },
   send: {
     title: "トークンを送信",
@@ -234,7 +237,13 @@ export const ja = {
   nft: {
     title: "NFT",
     comingSoon: "近日公開",
-    description: "NFTサポートがGorbagウォレットに追加される予定です"
+    description: "NFT対応はGorbag Walletに近々登場します",
+    yourNFTs: "あなたのNFT",
+    noNFTs: "NFTなし",
+    noNFTsDescription: "まだNFTを所有していません",
+    getGorbagioNFT: "Gorbagio NFTを取得",
+    getGorbagioNFTDescription: "Magic EdenでGorbagioコレクションを探索",
+    getOnMagicEden: "Magic Edenで取得"
   },
   token: {
     title: "トークン詳細",

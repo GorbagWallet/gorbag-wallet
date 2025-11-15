@@ -38,8 +38,11 @@ export const fr = {
     networkSolana: "Réseau Solana",
     networkGorbagana: "Réseau Gorbagana",
     viewDetails: "Voir les détails",
-    addWallet: "+ Ajouter un portefeuille",
-    swapTokens: "Échanger des jetons"
+    addWallet: "+ Ajouter un Portefeuille",
+    swapTokens: "Échanger des Tokens",
+    searchTokens: "Rechercher des tokens...",
+    noTokensFound: "Aucun token trouvé",
+    noTokensFoundDescription: "Essayez d'ajuster votre recherche ou ajoutez plus de tokens à votre portefeuille"
   },
   send: {
     title: "Envoyer des jetons",
@@ -233,8 +236,14 @@ export const fr = {
   },
   nft: {
     title: "NFTs",
-    comingSoon: "Bientôt disponible",
-    description: "Le support NFT arrive sur Gorbag Wallet"
+    comingSoon: "À Venir",
+    description: "Le support des NFTs arrive sur Gorbag Wallet",
+    yourNFTs: "Vos NFTs",
+    noNFTs: "Pas de NFTs",
+    noNFTsDescription: "Vous ne possédez pas encore de NFTs",
+    getGorbagioNFT: "Obtenez un NFT Gorbagio",
+    getGorbagioNFTDescription: "Découvrez la collection Gorbagio sur Magic Eden",
+    getOnMagicEden: "Obtenir sur Magic Eden"
   },
   token: {
     title: "Détails du token",

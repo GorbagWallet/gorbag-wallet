@@ -39,7 +39,10 @@ export const ko = {
     networkGorbagana: "Gorbagana 네트워크",
     viewDetails: "세부 정보 보기",
     addWallet: "+ 지갑 추가",
-    swapTokens: "토큰 스왑"
+    swapTokens: "토큰 교환",
+    searchTokens: "토큰 검색...",
+    noTokensFound: "토큰을 찾을 수 없음",
+    noTokensFoundDescription: "검색어를 조정하거나 더 많은 토큰을 지갑에 추가해 보세요"
   },
   send: {
     title: "토큰 전송",
@@ -233,8 +236,14 @@ export const ko = {
   },
   nft: {
     title: "NFT",
-    comingSoon: "곧 출시",
-    description: "NFT 지원이 Gorbag 지갑에 추가될 예정입니다"
+    comingSoon: "준비 중",
+    description: "NFT 지원 기능이 곧 고르바그 지갑에 추가됩니다",
+    yourNFTs: "내 NFT",
+    noNFTs: "NFT 없음",
+    noNFTsDescription: "아직 NFT를 소유하고 있지 않습니다",
+    getGorbagioNFT: "Gorbagio NFT 받기",
+    getGorbagioNFTDescription: "Magic Eden에서 Gorbagio 컬렉션 살펴보기",
+    getOnMagicEden: "Magic Eden에서 받기"
   },
   token: {
     title: "토큰 세부정보",

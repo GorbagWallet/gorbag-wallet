@@ -234,7 +234,13 @@ export const th = {
   nft: {
     title: "NFT",
     comingSoon: "เร็ว ๆ นี้",
-    description: "การรองรับ NFT กำลังจะมาใน Gorbag Wallet"
+    description: "การรองรับ NFT กำลังจะมาใน Gorbag Wallet",
+    yourNFTs: "NFT ของคุณ",
+    noNFTs: "ไม่มี NFT",
+    noNFTsDescription: "คุณยังไม่มี NFT",
+    getGorbagioNFT: "รับ Gorbagio NFT",
+    getGorbagioNFTDescription: "สำรวจคอลเลกชัน Gorbagio บน Magic Eden",
+    getOnMagicEden: "รับบน Magic Eden"
   },
   token: {
     title: "รายละเอียดโทเค็น",
